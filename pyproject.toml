@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "jev-systemone-local"
 version = "0.1.0"
 description = "Local Jev-compatible decision API backed by Laya MLX and Core ML"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115,<1",

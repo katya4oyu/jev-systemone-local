@@ -99,6 +99,10 @@ MLXと汎用Core MLのモデルは最大1,024トークン、Neural Engine用の`
 
 参考実装をそのままコピーするのではなく、**TypeSafe公式の互換性を正本**とし、各実装からはサーバ構造・adapter境界・運用上の知見だけを取り入れる。
 
+## ライセンス
+
+本リポジトリのコードは [MIT License](LICENSE) で公開する。同梱するTypeSafe公式JavaScript SDKには、別途 [TypeSafeのMITライセンス](src/jev_systemone_local/vendor/LICENSE.typesafe-sdk) が適用される。
+
 ## 開発状況
 
 `laya-mlx` と `laya-coreml` のHTTP APIとWebデモを実装。`laya-onnx` は未対応。従来のプレビューはユーザーがiPhone実機で確認済み。公式SDKを使用する画面への変更後は、改めて実機で確認する。
