@@ -42,12 +42,16 @@ label{display:block;font-weight:700;font-size:14px;margin-bottom:9px}select{widt
     "criteria": ["can wait", "soon", "today"]
   }
 }</textarea>
-<p class="hint">質問の型は choice、noul、score。公式の <code>POST /v1/systemone</code> と同じ形式です。</p>
+<p class="hint">公式JavaScript SDK v0.6.0で、このサーバのモデル一覧と判定を呼び出します。質問の型は choice、noul、score。</p>
 <div class="actions"><button id="run" class="primary">判断する</button><button id="reset" class="secondary">例に戻す</button></div><div id="error" role="alert"></div></section>
 <section class="card" id="output" aria-live="polite"><span class="eyebrow">RESULT / LOCAL MODEL</span><h2>判断結果</h2><small id="meta"></small><div id="results"></div><details><summary>APIの応答を見る</summary><pre id="raw"></pre></details></section>
 <p class="hint"><a href="/snake">Laya Snakeを試す</a> · <a href="/docs">API仕様</a> · <a href="/v1/models">モデル一覧</a></p>
 </main>
-<script>
+<script type="module">
+import { TypeSafeClient } from "/vendor/typesafe-sdk.mjs";
+
+// This local server does not authenticate API keys. Never put a real key in a browser.
+const client=new TypeSafeClient({apiKey:'local-demo-placeholder',baseURL:window.location.origin,dangerouslyAllowBrowser:true});
 const state=document.querySelector('#state'), questions=document.querySelector('#questions');
 const original={state:state.value,questions:questions.value};
 const run=document.querySelector('#run'),error=document.querySelector('#error'),output=document.querySelector('#output');
@@ -57,8 +61,7 @@ function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.cl
 function bar(parent,label,value){const row=element('div','row');row.append(element('span','',label));const track=element('div','track'),fill=element('div','fill');fill.style.width=(Math.max(0,Math.min(1,value))*100)+'%';track.append(fill);row.append(track,element('span','',Math.round(value*100)+'%'));parent.append(row)}
 run.onclick=async()=>{error.textContent='';run.disabled=true;run.textContent='判断中…';output.style.display='none';try{
  const payload={model:document.querySelector('#model').value,state:state.value,questions:JSON.parse(questions.value)};
- const response=await fetch('/v1/systemone',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
- const data=await response.json();if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:JSON.stringify(data.detail));
+ const data=await client.systemOne(payload);
  const results=document.querySelector('#results');results.replaceChildren();
  for(const [name,answer] of Object.entries(data.answers)){const card=element('div','answer');card.append(element('h3','',name+' · '+answer.type));
  if(answer.type==='choice'){card.append(element('strong','',answer.choice));for(const [key,value] of Object.entries(answer.probabilities))bar(card,key,value)}
@@ -67,6 +70,6 @@ run.onclick=async()=>{error.textContent='';run.disabled=true;run.textContent='�
  results.append(card)}
  document.querySelector('#meta').textContent=data.model+' · 入力 '+data.usage.input_tokens+' tokens / 出力 '+data.usage.output_tokens+' tokens';document.querySelector('#raw').textContent=JSON.stringify(data,null,2);output.style.display='block';
  }catch(e){error.textContent='判定できませんでした: '+e.message}finally{run.disabled=false;run.textContent='判断する'}};
-async function loadModels(){try{const res=await fetch('/v1/models');if(!res.ok)throw Error();const data=await res.json();const select=document.querySelector('#model');const chosen=select.value;select.replaceChildren(...data.models.filter(m=>m.name!=='jev-latest').map(m=>new Option(m.name.endsWith('-ane')?'Core ML · Neural Engine (96)':m.backend==='laya-coreml'?'Core ML · 通常 (1024)':'MLX (1024)',m.name)));select.value=chosen}catch{error.textContent='モデル一覧を取得できませんでした。MLXのみ表示しています。'}}
+async function loadModels(){try{const models=await client.models.list();const select=document.querySelector('#model');const chosen=select.value;select.replaceChildren(...models.filter(m=>m.name!=='jev-latest').map(m=>new Option(m.name.endsWith('-ane')?'Core ML · Neural Engine (96)':m.backend==='laya-coreml'?'Core ML · 通常 (1024)':'MLX (1024)',m.name)));select.value=chosen}catch{error.textContent='モデル一覧を取得できませんでした。MLXのみ表示しています。'}}
 health();loadModels();
 </script></body></html>

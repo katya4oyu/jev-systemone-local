@@ -46,7 +46,7 @@ tailscale ip -4
 uv run jev-systemone-local --host <MacのTailscale IPv4> --port 8017
 ```
 
-iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面でMLXまたはCore MLのモデルを選び「判断する」を押すと、このMacで判定する。同じサーバの `/snake` では、モデルを選んで「新しいゲーム」を始められる。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
+iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面は同一サーバから配信するTypeSafe公式JavaScript SDK v0.6.0を使い、`models.list()` と `systemOne()` でMLXまたはCore MLの判定を呼び出す。ブラウザ用にはローカルサーバが検証しないダミーキーだけを指定する。実際のAPIキーをブラウザへ渡さない。同じサーバの `/snake` は独自のゲームAPIを使うため、SDK互換性の確認対象ではない。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
 
 ## Snakeデモ
 
@@ -56,7 +56,8 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 
 ## API
 
-- `GET /`：スマートフォンでも使える判断デモ。入力文と質問JSONを編集できる。
+- `GET /`：公式JavaScript SDK経由で動く判断デモ。入力文と質問JSONを編集できる。
+- `GET /vendor/typesafe-sdk.mjs`：同一サーバから配信する公式SDK v0.6.0のESM配布物（MITライセンスは `src/jev_systemone_local/vendor/LICENSE.typesafe-sdk`）。
 - `POST /v1/systemone`：TypeSafeの`state`、`model`、`questions`形式。`choice`、`score`、`noul`を扱う。
 - `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。ほかに`laya-multilingual-coreml`と`laya-multilingual-coreml-ane`を公開する。
 - `GET /healthz`：モデルの読み込みが完了してから`ready`を返す。
@@ -100,4 +101,4 @@ MLXと汎用Core MLのモデルは最大1,024トークン、Neural Engine用の`
 
 ## 開発状況
 
-`laya-mlx` と `laya-coreml` のHTTP APIとWebデモを実装。`laya-onnx` は未対応。iPhone実機での操作確認はこれから。
+`laya-mlx` と `laya-coreml` のHTTP APIとWebデモを実装。`laya-onnx` は未対応。従来のプレビューはユーザーがiPhone実機で確認済み。公式SDKを使用する画面への変更後は、改めて実機で確認する。
