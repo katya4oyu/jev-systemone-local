@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Jev System One Local · Laya-MLX</title>
+<title>Jev System One Local · Laya</title>
 <style>
 :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;background:#f4f3ee;color:#1e2930}*{box-sizing:border-box}
 body{margin:0;padding:env(safe-area-inset-top) max(18px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(18px,env(safe-area-inset-left))}
@@ -10,16 +10,17 @@ main{max-width:800px;margin:0 auto;padding:32px 0 72px}header{display:flex;align
 h1{font-size:clamp(26px,6vw,38px);letter-spacing:-.04em;margin:14px 0 6px}p{line-height:1.6;color:#53616a;margin:8px 0 22px}small{color:#647177}
 .badge{border-radius:99px;padding:6px 11px;background:#dde5e0;color:#285544;font-weight:650;font-size:12px}.badge.off{background:#fae0d8;color:#8f3528}
 .card{background:white;border:1px solid #e3e6e2;border-radius:18px;padding:22px;margin-top:18px;box-shadow:0 8px 32px #26332e0a}
-label{display:block;font-weight:700;font-size:14px;margin-bottom:9px}textarea{width:100%;border:1px solid #cbd4d0;border-radius:12px;background:#fbfcfa;color:#19252b;font:16px/1.55 ui-monospace,SFMono-Regular,monospace;padding:13px;resize:vertical;outline-color:#296d59}#state{min-height:110px}#questions{min-height:220px}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:9px}select{width:100%;border:1px solid #cbd4d0;border-radius:12px;background:#fbfcfa;color:#19252b;font:16px/1.55 -apple-system,BlinkMacSystemFont,sans-serif;padding:13px;max-width:460px}textarea{width:100%;border:1px solid #cbd4d0;border-radius:12px;background:#fbfcfa;color:#19252b;font:16px/1.55 ui-monospace,SFMono-Regular,monospace;padding:13px;resize:vertical;outline-color:#296d59}#state{min-height:110px}#questions{min-height:220px}
 .eyebrow{font:700 11px/1.4 ui-monospace,monospace;color:#547365;letter-spacing:.12em;text-transform:uppercase}.hint{font-size:12px;margin:8px 0 0;color:#68787e}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}button{font:inherit;font-weight:650;font-size:15px;border:0;border-radius:11px;padding:13px 18px;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.55;cursor:wait}.primary{background:#184e40;color:white;min-width:140px}.secondary{background:#e9eeea;color:#245545}
 #error{color:#9b3327;margin-top:12px;white-space:pre-wrap}#output{display:none}#results{display:grid;gap:12px;margin-top:16px}.answer{padding:14px;border:1px solid #e0e7e1;border-radius:12px;background:#fafcf9}.answer h3{font-size:15px;margin:0 0 8px;overflow-wrap:anywhere}.answer strong{font-size:23px}.track{height:9px;background:#e4ebe7;border-radius:8px;overflow:hidden;flex:1}.fill{height:100%;background:#48a381}.row{display:flex;gap:10px;align-items:center;margin:8px 0;font-size:13px}.row span:first-child{min-width:95px;overflow-wrap:anywhere}.row span:last-child{width:54px;text-align:right;font-variant-numeric:tabular-nums}details{margin-top:18px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#f4f6f3;padding:12px;border-radius:10px}a{color:#225b49}
 </style>
 </head>
 <body><main>
-<header><span class="eyebrow">LOCAL DECISION LAB / LAYA-MLX</span><span id="health" class="badge off">接続確認中</span></header>
+<header><span class="eyebrow">LOCAL DECISION LAB / LAYA</span><span id="health" class="badge off">接続確認中</span></header>
 <h1>文章を、判断に変える。</h1>
-<p>このMac上のLaya-MLXが、入力した状況について選択、段階評価、はい／いいえを判定します。結果は推論値であり、正解や行動許可を保証しません。</p>
+<p>このMac上の選んだLayaモデルが、入力した状況について選択、段階評価、はい／いいえを判定します。結果は推論値であり、正解や行動許可を保証しません。</p>
+<section class="card"><label for="model">判定モデル</label><select id="model"><option value="laya-multilingual-mlx">MLX · laya-multilingual-mlx</option></select><p class="hint">Neural Engine版は入力全体で96トークンまで。長い入力は自動で別モデルに切り替えず、エラーでお知らせします。</p></section>
 <section class="card"><label for="state">判断する文章・状況</label><textarea id="state">請求が二重になっています。今日中に返金をお願いします。</textarea><p class="hint">短い文章を入力してください。処理はこのMacで行われ、クラウドのJevには送信しません。</p></section>
 <section class="card"><label for="questions">質問（JSON）</label><textarea id="questions" spellcheck="false">{
   "department": {
@@ -44,7 +45,7 @@ label{display:block;font-weight:700;font-size:14px;margin-bottom:9px}textarea{wi
 <p class="hint">質問の型は choice、noul、score。公式の <code>POST /v1/systemone</code> と同じ形式です。</p>
 <div class="actions"><button id="run" class="primary">判断する</button><button id="reset" class="secondary">例に戻す</button></div><div id="error" role="alert"></div></section>
 <section class="card" id="output" aria-live="polite"><span class="eyebrow">RESULT / LOCAL MODEL</span><h2>判断結果</h2><small id="meta"></small><div id="results"></div><details><summary>APIの応答を見る</summary><pre id="raw"></pre></details></section>
-<p class="hint">Backend: <strong>laya-mlx</strong> · <a href="/snake">Laya Snakeを試す</a> · <a href="/docs">API仕様</a> · <a href="/v1/models">モデル一覧</a></p>
+<p class="hint"><a href="/snake">Laya Snakeを試す</a> · <a href="/docs">API仕様</a> · <a href="/v1/models">モデル一覧</a></p>
 </main>
 <script>
 const state=document.querySelector('#state'), questions=document.querySelector('#questions');
@@ -55,7 +56,7 @@ async function health(){try{const res=await fetch('/healthz');if(!res.ok)throw E
 function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=String(text);return el}
 function bar(parent,label,value){const row=element('div','row');row.append(element('span','',label));const track=element('div','track'),fill=element('div','fill');fill.style.width=(Math.max(0,Math.min(1,value))*100)+'%';track.append(fill);row.append(track,element('span','',Math.round(value*100)+'%'));parent.append(row)}
 run.onclick=async()=>{error.textContent='';run.disabled=true;run.textContent='判断中…';output.style.display='none';try{
- const payload={model:'jev-latest',state:state.value,questions:JSON.parse(questions.value)};
+ const payload={model:document.querySelector('#model').value,state:state.value,questions:JSON.parse(questions.value)};
  const response=await fetch('/v1/systemone',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
  const data=await response.json();if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:JSON.stringify(data.detail));
  const results=document.querySelector('#results');results.replaceChildren();
@@ -66,5 +67,6 @@ run.onclick=async()=>{error.textContent='';run.disabled=true;run.textContent='�
  results.append(card)}
  document.querySelector('#meta').textContent=data.model+' · 入力 '+data.usage.input_tokens+' tokens / 出力 '+data.usage.output_tokens+' tokens';document.querySelector('#raw').textContent=JSON.stringify(data,null,2);output.style.display='block';
  }catch(e){error.textContent='判定できませんでした: '+e.message}finally{run.disabled=false;run.textContent='判断する'}};
-health();
+async function loadModels(){try{const res=await fetch('/v1/models');if(!res.ok)throw Error();const data=await res.json();const select=document.querySelector('#model');const chosen=select.value;select.replaceChildren(...data.models.filter(m=>m.name!=='jev-latest').map(m=>new Option(m.name.endsWith('-ane')?'Core ML · Neural Engine (96)':m.backend==='laya-coreml'?'Core ML · 通常 (1024)':'MLX (1024)',m.name)));select.value=chosen}catch{error.textContent='モデル一覧を取得できませんでした。MLXのみ表示しています。'}}
+health();loadModels();
 </script></body></html>

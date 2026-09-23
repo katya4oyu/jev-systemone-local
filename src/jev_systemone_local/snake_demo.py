@@ -23,6 +23,7 @@ class FinishedGame(RuntimeError):
 class Session:
     game: SnakeGame
     touched: float
+    model: str = "laya-multilingual-mlx"
     interventions: int = 0
 
 
@@ -32,8 +33,9 @@ class SnakeService:
     max_sessions = 16
     idle_seconds = 3600
 
-    def __init__(self, policy: Any):
+    def __init__(self, policy: Any, policies: dict[str, Any] | None = None):
         self.policy = policy
+        self.policies = policies if policies is not None else {"laya-multilingual-mlx": policy}
         self.sessions: OrderedDict[str, Session] = OrderedDict()
 
     def _prune(self):
@@ -43,14 +45,17 @@ class SnakeService:
                 del self.sessions[key]
 
 
-    def start(self, seed: int | None = None) -> dict:
+    def start(self, seed: int | None = None, model: str = "laya-multilingual-mlx") -> dict:
         self._prune()
+        if model not in self.policies:
+            raise ValueError(f"unsupported model: {model}")
         while len(self.sessions) >= self.max_sessions:
             self.sessions.popitem(last=False)
         session_id = secrets.token_urlsafe(18)
         game = SnakeGame(seed=secrets.randbelow(2**31) if seed is None else seed)
-        self.sessions[session_id] = Session(game, time.monotonic())
-        return {"session": session_id, "board": game.snapshot(), "guarded": self.policy.guarded}
+        self.sessions[session_id] = Session(game, time.monotonic(), model)
+        return {"session": session_id, "board": game.snapshot(),
+                "guarded": self.policies[model].guarded, "model": model}
 
     def step(self, session_id: str) -> dict:
         self._prune()
@@ -61,7 +66,7 @@ class SnakeService:
         if not game.alive or game.won:
             raise FinishedGame("Round already finished; start a new round")
         before = game.snapshot()
-        decision = self.policy.decide(game)
+        decision = self.policies[session.model].decide(game)
         if decision.executed not in {"UP", "DOWN", "LEFT", "RIGHT"}:
             raise ValueError("Model returned an invalid move")
         game.step(decision.executed)
@@ -72,13 +77,18 @@ class SnakeService:
                 "decision": decision.to_dict(), "interventions": session.interventions}
 
 
-def policy_for_backend(backend: Any) -> LayaPolicy:
-    """Reuse the HTTP backend's already-loaded MLX Agent, not a second weights copy.
+def policy_for_backend(backend: Any) -> Any:
+    """Reuse the HTTP backend's already-loaded Agent, not a second weights copy.
 
     LayaPolicy.decide only reads agent/guarded/prompt. Its constructor is
     intentionally skipped because that would load a second checkpoint.
     """
-    policy = object.__new__(LayaPolicy)
+    if getattr(backend, "backend_name", None) == "laya-coreml":
+        from laya_coreml.snake.policy import LayaPolicy as CoreMLPolicy
+        policy_class = CoreMLPolicy
+    else:
+        policy_class = LayaPolicy
+    policy = object.__new__(policy_class)
     policy.agent = backend.agent
     policy.guarded = True
     policy.prompt = "compact"
