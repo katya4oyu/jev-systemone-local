@@ -97,6 +97,11 @@ def create_app(backend: Any = None, snake_policy: Any = None,
     def playground():
         return FileResponse(Path(__file__).with_name("playground.html"), media_type="text/html")
 
+    @app.get("/vendor/typesafe-sdk.mjs", include_in_schema=False)
+    def official_sdk():
+        return FileResponse(Path(__file__).with_name("vendor") / "typesafe-sdk.mjs",
+                            media_type="text/javascript")
+
     @app.get("/snake", include_in_schema=False)
     def snake_page():
         return FileResponse(Path(__file__).with_name("snake.html"), media_type="text/html")

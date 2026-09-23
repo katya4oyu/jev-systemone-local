@@ -34,6 +34,21 @@ def test_playground_and_decision():
                                  "usage": {"input_tokens": 8, "output_tokens": 0}}
 
 
+def test_playground_uses_served_official_sdk():
+    with TestClient(create_app(FakeBackend())) as client:
+        page = client.get("/").text
+        assert '<script type="module">' in page
+        assert 'from "/vendor/typesafe-sdk.mjs"' in page
+        assert "baseURL:window.location.origin" in page
+        assert "dangerouslyAllowBrowser:true" in page
+        assert "client.systemOne(payload)" in page
+        assert "client.models.list()" in page
+        sdk = client.get("/vendor/typesafe-sdk.mjs")
+        assert sdk.status_code == 200
+        assert sdk.headers["content-type"].startswith("text/javascript")
+        assert 'const VERSION = "0.6.0"' in sdk.text
+
+
 def test_validation_and_overlength_are_explicit():
     with TestClient(create_app(FakeBackend())) as client:
         assert client.post("/v1/systemone", json=request(model="unknown")).status_code == 422
