@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laya Snake · ローカル推論デモ</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#e8f5ee;background:#091410;color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;padding:env(safe-area-inset-top) max(16px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(16px,env(safe-area-inset-left))}
+main{max-width:1000px;margin:auto;padding:22px 0 70px}header{display:flex;justify-content:space-between;align-items:center;gap:16px}a{color:#9ee2c0;text-decoration:none}a:hover{text-decoration:underline}
+.eyebrow{font:700 11px/1.5 ui-monospace,SFMono-Regular,monospace;letter-spacing:.12em;color:#7eb39a}h1{font-size:clamp(30px,7vw,48px);margin:12px 0 2px;letter-spacing:-.04em}p{color:#b0c6bb;line-height:1.5;margin:8px 0 16px;font-size:14px}
+.columns{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;align-items:start}.panel{background:#11251c;border:1px solid #294738;border-radius:20px;padding:18px;min-width:0}.panel h2{font-size:16px;margin:0 0 14px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}.stats div{display:grid;gap:2px}.stats span,.small-label{font-size:11px;letter-spacing:.08em;color:#a2bcaa}.stats strong{font-size:25px;font-variant-numeric:tabular-nums}
+#board{width:100%;display:grid;grid-template-columns:repeat(var(--columns),minmax(0,1fr));gap:1px;border-radius:9px;padding:5px;background:#1e3c2b;aspect-ratio:var(--columns)/var(--rows);overflow:hidden}
+.cell{min-width:0;min-height:0;background:#173023;border-radius:2px}.cell.body{background:#3b9b6b}.cell.head{background:#d4ffe1}.cell.food{background:#f6c76b;border-radius:50%}
+.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:16px}button,select{font:inherit;font-weight:600;font-size:15px;border-radius:10px;border:1px solid #4e735a;padding:11px 14px;min-height:44px;color:#e9f7ed;background:#23513b;touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button.main-button{background:#85dab0;color:#10251b;border-color:#85dab0}select{font-size:16px;min-width:92px}label{color:#bfddc9;font-size:13px}
+#status{min-height:24px;margin-top:14px;color:#c6e4d2}#status.error{color:#ffb7aa}.direction{display:grid;grid-template-columns:60px 1fr 46px;gap:10px;align-items:center;margin:12px 0;font-variant-numeric:tabular-nums;font-size:13px}.direction .meter,.metric .meter{height:10px;border-radius:99px;background:#2b4535;overflow:hidden}.fill{height:100%;width:0;background:#80d9ab;border-radius:99px}.direction.selected .fill{background:#f3c76e}.direction.selected .name{color:#ffe5a5;font-weight:700}.direction .value{text-align:right}
+.decision{padding:12px;border:1px solid #335540;border-radius:12px;background:#193526;margin-top:12px}.decision strong{display:block;font-size:18px;margin-top:4px}.decision em{font-style:normal;color:#ffce81;font-size:12px}.metric{margin:16px 0}.metric-title{display:flex;justify-content:space-between;font-size:13px;color:#bfd8c6;margin-bottom:7px}.metric .fill{background:#f1ba75}.foot{font-size:12px;color:#adc7b4;margin-top:17px;border-top:1px solid #315340;padding-top:13px;line-height:1.6}.note{font-size:12px;color:#b5cbbd;margin-top:16px}
+@media(max-width:750px){.columns{grid-template-columns:1fr}.panel{padding:15px}.stats{justify-content:space-between}main{padding-top:16px}}
+</style></head><body><main>
+<header><span class="eyebrow">LAYA / MLX / SNAKE</span><a href="/">文章の判断デモへ</a></header>
+<h1>モデルの一手を見る。</h1><p>Snakeの各手をMac上のLaya-MLXが判断します。iPhoneは盤面と判定結果を受け取ります。</p>
+<div class="columns"><section class="panel"><div class="stats"><div><span>スコア</span><strong id="score">0</strong></div><div><span>長さ</span><strong id="length">6</strong></div><div><span>手数</span><strong id="ticks">0</strong></div></div>
+<div id="board" role="img" aria-label="Snakeの盤面。読み込み中"></div>
+<div class="controls"><button id="play" class="main-button" disabled>読み込み中</button><button id="restart">新しいゲーム</button><label for="speed">速度の上限</label><select id="speed"><option value="2">2手/秒</option><option value="6" selected>6手/秒</option><option value="12">12手/秒</option></select></div>
+<div id="status" role="status" aria-live="polite">ゲームを準備中</div></section>
+<section class="panel"><h2>直前の判断</h2><p class="note">盤面は実行後の状態です。以下はその直前の盤面に対する実際のモデル出力です。</p>
+<div id="directions"></div><div class="decision"><span class="small-label">モデルの第一候補 → 実際に動かした方向</span><strong id="moves">まだ判断していません</strong><em id="shield"></em></div>
+<div class="metric"><div class="metric-title"><span>行き止まりの推定値</span><span id="risk-value">—</span></div><div class="meter"><div id="risk-fill" class="fill"></div></div></div>
+<div class="metric"><div class="metric-title"><span>現時点の空きマスから餌に到達できる推定値</span><span id="food-value">—</span></div><div class="meter"><div id="food-fill" class="fill"></div></div></div>
+<div class="foot"><span id="timing">推論時間 —</span><br>安全補助の介入 <span id="interventions">0</span>回。<strong>安全補助あり</strong>：進行可能な方向からモデルの確率が最も高いものを選びます。モデルの第一候補と実行方向が異なる場合は明示します。推定値は校正された死亡確率ではありません。</div></section></div>
+<p class="note">毎手、実際のモデル推論を行います。最大速度は通信とMacの推論時間に依存します。ページを再読み込みすると新しいゲームになります。</p>
+</main><script>
+const $=s=>document.querySelector(s), board=$('#board'), play=$('#play'), restart=$('#restart'), status=$('#status');
+let session=null, running=false, busy=false, timer=null, currentBoard=null, generation=0;
+const directions=['UP','DOWN','LEFT','RIGHT'], names={UP:'上',DOWN:'下',LEFT:'左',RIGHT:'右'};
+function setStatus(text,isError=false){status.textContent=text;status.classList.toggle('error',isError)}
+function draw(game){currentBoard=game;board.style.setProperty('--columns',game.width);board.style.setProperty('--rows',game.height);
+ const body=new Map(game.body.map(([x,y],i)=>[x+','+y,i===0?'head':'body']));const food=game.food&&game.food.join(',');const cells=document.createDocumentFragment();
+ for(let y=0;y<game.height;y++)for(let x=0;x<game.width;x++){const cell=document.createElement('div');cell.className='cell '+(body.get(x+','+y)||((x+','+y)===food?'food':''));cells.append(cell)}board.replaceChildren(cells);
+ $('#score').textContent=game.score;$('#length').textContent=game.length;$('#ticks').textContent=game.ticks;
+ board.setAttribute('aria-label',`Snakeの盤面。スコア${game.score}、長さ${game.length}、手数${game.ticks}、先頭${game.body[0].join('、')}、餌${game.food?game.food.join('、'):'なし'}`)}
+function showDecision(data){const d=data.decision, rows=document.createDocumentFragment();for(const key of directions){const row=document.createElement('div');row.className='direction'+(d.proposed===key?' selected':'');const name=document.createElement('span');name.className='name';name.textContent=names[key];const meter=document.createElement('div');meter.className='meter';const fill=document.createElement('div');fill.className='fill';fill.style.width=Math.max(0,Math.min(100,100*d.probabilities[key]))+'%';meter.append(fill);const value=document.createElement('span');value.className='value';value.textContent=(100*d.probabilities[key]).toFixed(1)+'%';row.append(name,meter,value);rows.append(row)}$('#directions').replaceChildren(rows);
+ $('#moves').textContent=names[d.proposed]+' → '+names[d.executed];$('#shield').textContent=d.intervened?'安全補助が介入しました':'';$('#interventions').textContent=data.interventions;
+ for(const [prefix,num] of [['risk',d.dead_end_risk],['food',d.food_reachable]]){$('#'+prefix+'-value').textContent=(num*100).toFixed(1)+'%';$('#'+prefix+'-fill').style.width=Math.max(0,Math.min(100,num*100))+'%'}
+ $('#timing').textContent='Macの推論 '+d.inference_ms.toFixed(1)+' ms / 今回の処理 '+d.decision_ms.toFixed(1)+' ms'}
+function stop(){running=false;clearTimeout(timer);play.textContent='再開';if(currentBoard&&!currentBoard.alive)play.disabled=true;else if(currentBoard?.won)play.disabled=true;else play.disabled=!session}
+async function request(url){const res=await fetch(url,{method:'POST'});const data=await res.json();if(!res.ok)throw Error(typeof data.detail==='string'?data.detail:'通信エラー '+res.status);return data}
+async function newGame(){stop();busy=true;restart.disabled=true;play.disabled=true;const token=++generation;setStatus('新しいゲームを準備中');try{const data=await request('/snake/api/sessions');if(token!==generation)return;session=data.session;draw(data.board);$('#directions').replaceChildren();$('#moves').textContent='まだ判断していません';$('#shield').textContent='';$('#risk-value').textContent='—';$('#food-value').textContent='—';$('#risk-fill').style.width='0';$('#food-fill').style.width='0';$('#interventions').textContent='0';$('#timing').textContent='推論時間 —';play.disabled=false;play.textContent='開始';setStatus('開始を押すと、毎手Macで推論します')}catch(e){session=null;setStatus('開始できません: '+e.message,true)}finally{busy=false;restart.disabled=false}}
+function schedule(){if(!running||busy)return;timer=setTimeout(tick,0)}
+async function tick(){if(!running||busy||!session)return;busy=true;const token=generation;const started=performance.now();try{const data=await request('/snake/api/sessions/'+encodeURIComponent(session)+'/step');if(token!==generation)return;draw(data.board);showDecision(data);
+ if(data.board.won||!data.board.alive){stop();setStatus(data.board.won?'盤面を埋めました！':'ゲーム終了: '+(data.board.death_reason||'衝突'));return}
+ if(running){setStatus('推論中 · '+data.board.ticks+'手');const delay=Math.max(0,1000/Number($('#speed').value)-(performance.now()-started));timer=setTimeout(tick,delay)}
+ }catch(e){if(token===generation){stop();setStatus('進められません: '+e.message,true)}}finally{busy=false}}
+play.onclick=()=>{if(running){stop();setStatus('一時停止中');return}if(!session||!currentBoard?.alive||currentBoard.won)return;running=true;play.textContent='一時停止';setStatus('推論中');schedule()};restart.onclick=newGame;newGame();
+</script></body></html>

@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from starlette.concurrency import run_in_threadpool
 
 from .laya_mlx_backend import InputTooLong, LayaMLXBackend
+from .snake_demo import FinishedGame, SnakeService, UnknownGame, policy_for_backend
 
 JsonValue = str | dict[str, Any] | list[Any]
 
@@ -55,13 +56,17 @@ class DecisionRequest(BaseModel):
         return self
 
 
-def create_app(backend: Any = None) -> FastAPI:
+def create_app(backend: Any = None, snake_policy: Any = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # Fail startup if the checkpoint cannot load. /healthz must never imply a
         # working model before weights are actually available.
         app.state.backend = backend if backend is not None else LayaMLXBackend()
         app.state.inference_lock = Lock()
+        policy = snake_policy if snake_policy is not None else (
+            policy_for_backend(app.state.backend) if hasattr(app.state.backend, "agent") else None
+        )
+        app.state.snake = SnakeService(policy) if policy is not None else None
         yield
 
     app = FastAPI(title="Jev System One Local", lifespan=lifespan)
@@ -69,6 +74,29 @@ def create_app(backend: Any = None) -> FastAPI:
     @app.get("/", include_in_schema=False)
     def playground():
         return FileResponse(Path(__file__).with_name("playground.html"), media_type="text/html")
+
+    @app.get("/snake", include_in_schema=False)
+    def snake_page():
+        return FileResponse(Path(__file__).with_name("snake.html"), media_type="text/html")
+
+    @app.post("/snake/api/sessions")
+    async def start_snake():
+        def start():
+            with app.state.inference_lock:
+                return app.state.snake.start()
+        return await run_in_threadpool(start)
+
+    @app.post("/snake/api/sessions/{session_id}/step")
+    async def step_snake(session_id: str):
+        def step():
+            with app.state.inference_lock:
+                return app.state.snake.step(session_id)
+        try:
+            return await run_in_threadpool(step)
+        except UnknownGame as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except FinishedGame as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     @app.get("/healthz")
     def health():
