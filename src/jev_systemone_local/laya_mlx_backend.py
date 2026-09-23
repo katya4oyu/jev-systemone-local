@@ -6,6 +6,8 @@ import json
 import math
 from typing import Any
 
+from laya_mlx import common as mlx_common
+
 
 class InputTooLong(ValueError):
     """The complete state cannot fit in a model question's context window."""
@@ -14,6 +16,7 @@ class InputTooLong(ValueError):
 class LayaMLXBackend:
     backend_name = "laya-mlx"
     model_name = "laya-multilingual-mlx"
+    common = mlx_common
 
     def __init__(self, checkpoint: str = "aac6fef/laya-multilingual-mlx") -> None:
         import laya_mlx
@@ -24,16 +27,15 @@ class LayaMLXBackend:
     def evaluate(self, state: str | dict | list, questions: dict[str, dict]) -> dict[str, Any]:
         # Laya's build_sequence truncates state without alerting its caller. A decision
         # over an incomplete state would be misleading, so reject that input first.
-        from laya_mlx.common import build_prefix, serialize_state
-
         agent = self.agent
-        max_len = agent.cfg.get("max_len", 512)
+        max_len = min(agent.cfg.get("max_len", 512),
+                      getattr(agent, "shape", {}).get("max_length", agent.cfg.get("max_len", 512)))
         head_max_len = agent.cfg.get("head_max_len", 192)
-        text = serialize_state(state).replace(agent.tok.mask_token, " ")
+        text = self.common.serialize_state(state).replace(agent.tok.mask_token, " ")
         state_ids = agent.tok(text, add_special_tokens=False)["input_ids"]
         for name, question in questions.items():
             q = agent._to_internal(question)
-            prefix, markers = build_prefix(agent.tok, q, head_max_len)
+            prefix, markers = self.common.build_prefix(agent.tok, q, head_max_len)
             if len(markers) != (len(question["criteria"]) if q["t"] != "noul" else 2):
                 raise InputTooLong(f"Question {name!r} exceeds the options budget")
             available = max_len - len(prefix) - 1

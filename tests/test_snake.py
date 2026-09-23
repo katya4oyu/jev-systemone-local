@@ -1,6 +1,7 @@
 """The HTTP game must retain real per-step decisions and isolated sessions."""
 from types import SimpleNamespace
 
+import pytest
 from fastapi.testclient import TestClient
 from laya_mlx.snake.game import DIRECTIONS
 from laya_mlx.snake.policy import Decision
@@ -12,7 +13,11 @@ from jev_systemone_local.snake_demo import SnakeService, policy_for_backend
 class FakePolicy:
     guarded = True
 
+    def __init__(self):
+        self.calls = 0
+
     def decide(self, game):
+        self.calls += 1
         safe = next(move for move in game.moves() if move.safe)
         proposed = next(move.direction for move in game.moves() if not move.safe)
         return Decision(
@@ -52,6 +57,38 @@ def test_snake_page_and_separate_real_step_contract():
         assert client.post(f"/snake/api/sessions/{second['session']}/step").json()["board"]["ticks"] == 1
         assert client.post(f"/snake/api/sessions/{first['session']}/step").json()["board"]["ticks"] == 2
         assert client.post("/snake/api/sessions/not-a-game/step").status_code == 404
+
+
+def test_snake_session_uses_selected_model_for_every_step():
+    mlx = FakePolicy()
+    coreml = FakePolicy()
+    snake = SnakeService(mlx, policies={"laya-multilingual-mlx": mlx,
+                                        "laya-multilingual-coreml": coreml})
+    session = snake.start(seed=1, model="laya-multilingual-coreml")
+    assert session["model"] == "laya-multilingual-coreml"
+    snake.step(session["session"])
+    assert coreml.calls == 1
+    assert mlx.calls == 0
+    with pytest.raises(ValueError, match="unsupported model"):
+        snake.start(model="not-installed")
+
+
+def test_snake_http_start_selects_model_without_changing_legacy_request():
+    mlx = FakePolicy()
+    coreml = FakePolicy()
+    with TestClient(create_app(
+        backends={"laya-multilingual-mlx": FakeBackend()},
+        snake_policies={"laya-multilingual-mlx": mlx,
+                        "laya-multilingual-coreml": coreml},
+    )) as client:
+        old = client.post("/snake/api/sessions")
+        assert old.status_code == 200
+        assert old.json()["model"] == "laya-multilingual-mlx"
+        new = client.post("/snake/api/sessions", json={"model": "laya-multilingual-coreml"})
+        assert new.status_code == 200
+        client.post(f"/snake/api/sessions/{new.json()['session']}/step")
+        assert coreml.calls == 1 and mlx.calls == 0
+        assert client.post("/snake/api/sessions", json={"model": "unknown"}).status_code == 422
 
 
 def test_limited_sessions_and_shared_loaded_agent():

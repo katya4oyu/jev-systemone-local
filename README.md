@@ -46,11 +46,11 @@ tailscale ip -4
 uv run jev-systemone-local --host <MacのTailscale IPv4> --port 8017
 ```
 
-iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面の「判断する」を押すと、入力内容をこのMacのLaya-MLXで判定する。同じサーバの `/snake` では、Laya同梱のSnakeの盤面と各手の推論を確認できる。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
+iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面でMLXまたはCore MLのモデルを選び「判断する」を押すと、このMacで判定する。同じサーバの `/snake` では、モデルを選んで「新しいゲーム」を始められる。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
 
 ## Snakeデモ
 
-`/snake` では「開始」「一時停止」「新しいゲーム」、速度の上限を操作できる。盤面、方向ごとのモデル確率、モデルの第一候補、実行した方向、安全補助の介入、推論時間を表示する。判定は各手で実際のMac上のLaya-MLXによって行われる。ゲームのルールと安全補助の判定は `laya-mlx` 同梱の `SnakeGame` と `LayaPolicy` を利用し、読み込んだMLXモデルは文章判定APIと共有する。
+`/snake` ではモデル、「開始」「一時停止」「新しいゲーム」、速度の上限を操作できる。盤面、方向ごとのモデル確率、モデルの第一候補、実行した方向、安全補助の介入、推論時間を表示する。各手の判定にはゲーム開始時に選んだモデルを使う。ゲーム盤面は `laya-mlx` 同梱の `SnakeGame`、各モデルの推論には対応する `LayaPolicy` を利用する。文章判定APIとSnakeでモデルを共有し、重みを二重にロードしない。
 
 安全補助は元デモの既定どおり有効。元デモと同様にモデルは安全性や餌への進路の説明を入力として受けるので、盤面だけから戦略を学習した例ではない。画面に表示する確率はモデルの実出力で、移動後の盤面に添える「直前の判断」として扱う。推定値は校正された死亡確率ではない。ゲームはサーバのメモリに最大16件保持し、1時間操作がなければ期限切れになる。サーバ再起動でも失われる。速度の数値は上限であり、推論や通信が遅ければそれ以下になる。
 
@@ -58,13 +58,13 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 
 - `GET /`：スマートフォンでも使える判断デモ。入力文と質問JSONを編集できる。
 - `POST /v1/systemone`：TypeSafeの`state`、`model`、`questions`形式。`choice`、`score`、`noul`を扱う。
-- `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。
+- `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。ほかに`laya-multilingual-coreml`と`laya-multilingual-coreml-ane`を公開する。
 - `GET /healthz`：モデルの読み込みが完了してから`ready`を返す。
 - `GET /docs`：FastAPIの対話的なAPI仕様。
 
-公式Python SDKからは`TypeSafeClient(api_key="local-demo", base_url="http://127.0.0.1:8017")`を使える。ローカルサーバはAPIキーを検証しない。`model`応答には実際に判定した`laya-multilingual-mlx`を返す。
+公式Python SDKからは`TypeSafeClient(api_key="local-demo", base_url="http://127.0.0.1:8017")`を使える。ローカルサーバはAPIキーを検証しない。リクエストの`model`で推論先を選び、応答には実際に判定したモデル名を返す。Snakeの`POST /snake/api/sessions`も任意の`{"model":"laya-multilingual-coreml-ane"}`を受け付け、省略時は従来どおりMLXを使う。
 
-Layaの多言語チェックポイントは最大1,024トークン。state全体が収まらないときは黙って切り詰めず422を返す。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
+MLXと汎用Core MLのモデルは最大1,024トークン、Neural Engine用の`laya-multilingual-coreml-ane`は最大96トークン。state全体が質問の接頭辞とともに収まらないときは黙って切り詰めず422を返す。モデル間の暗黙の切り替えはしない。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
 
 ## 動作確認
 
@@ -100,4 +100,4 @@ Layaの多言語チェックポイントは最大1,024トークン。state全体
 
 ## 開発状況
 
-`laya-mlx` のHTTP APIとWebデモを実装。`laya-coreml` と `laya-onnx` は未対応。iPhone実機での操作確認はこれから。
+`laya-mlx` と `laya-coreml` のHTTP APIとWebデモを実装。`laya-onnx` は未対応。iPhone実機での操作確認はこれから。

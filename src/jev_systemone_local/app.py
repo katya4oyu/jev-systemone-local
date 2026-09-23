@@ -16,6 +16,7 @@ from .laya_mlx_backend import InputTooLong, LayaMLXBackend
 from .snake_demo import FinishedGame, SnakeService, UnknownGame, policy_for_backend
 
 JsonValue = str | dict[str, Any] | list[Any]
+DEFAULT_MODEL = "laya-multilingual-mlx"
 
 
 class Question(BaseModel):
@@ -49,24 +50,45 @@ class DecisionRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_request(self) -> DecisionRequest:
-        if self.model not in {"jev-latest", "laya-multilingual-mlx"}:
-            raise ValueError("unsupported model; available: jev-latest, laya-multilingual-mlx")
+        if not self.model:
+            raise ValueError("model must not be empty")
         if any(not key for key in self.questions):
             raise ValueError("question ids must not be empty")
         return self
 
 
-def create_app(backend: Any = None, snake_policy: Any = None) -> FastAPI:
+class SnakeStartRequest(BaseModel):
+    model: str = DEFAULT_MODEL
+
+
+def create_app(backend: Any = None, snake_policy: Any = None,
+               backends: dict[str, Any] | None = None,
+               snake_policies: dict[str, Any] | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # Fail startup if the checkpoint cannot load. /healthz must never imply a
         # working model before weights are actually available.
-        app.state.backend = backend if backend is not None else LayaMLXBackend()
+        if backends is not None:
+            app.state.backends = backends
+        elif backend is not None:
+            app.state.backends = {backend.model_name: backend}
+        else:
+            from .laya_coreml_backend import LayaCoreMLBackend
+            app.state.backends = {
+                DEFAULT_MODEL: LayaMLXBackend(),
+                "laya-multilingual-coreml": LayaCoreMLBackend(),
+                "laya-multilingual-coreml-ane": LayaCoreMLBackend(
+                    "aac6fef/laya-multilingual-coreml-ane"),
+            }
+        app.state.backend = app.state.backends[DEFAULT_MODEL]
         app.state.inference_lock = Lock()
-        policy = snake_policy if snake_policy is not None else (
-            policy_for_backend(app.state.backend) if hasattr(app.state.backend, "agent") else None
-        )
-        app.state.snake = SnakeService(policy) if policy is not None else None
+        policies = snake_policies if snake_policies is not None else {
+            name: policy_for_backend(selected)
+            for name, selected in app.state.backends.items() if hasattr(selected, "agent")
+        }
+        if snake_policy is not None:
+            policies[DEFAULT_MODEL] = snake_policy
+        app.state.snake = SnakeService(policies[DEFAULT_MODEL], policies=policies) if policies else None
         yield
 
     app = FastAPI(title="Jev System One Local", lifespan=lifespan)
@@ -80,11 +102,14 @@ def create_app(backend: Any = None, snake_policy: Any = None) -> FastAPI:
         return FileResponse(Path(__file__).with_name("snake.html"), media_type="text/html")
 
     @app.post("/snake/api/sessions")
-    async def start_snake():
+    async def start_snake(request: SnakeStartRequest | None = None):
         def start():
             with app.state.inference_lock:
-                return app.state.snake.start()
-        return await run_in_threadpool(start)
+                return app.state.snake.start(model=request.model if request else DEFAULT_MODEL)
+        try:
+            return await run_in_threadpool(start)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post("/snake/api/sessions/{session_id}/step")
     async def step_snake(session_id: str):
@@ -106,20 +131,26 @@ def create_app(backend: Any = None, snake_policy: Any = None) -> FastAPI:
     @app.get("/v1/models")
     def models():
         loaded = app.state.backend
-        description = "Local Laya-MLX multilingual checkpoint (Jev API compatible, not Jev weights)"
-        return {"models": [
-            {"name": name, "description": description, "release_date": "2026-09-19",
-             "backend": loaded.backend_name, "checkpoint": getattr(loaded, "checkpoint", None)}
-            for name in ("jev-latest", loaded.model_name)
-        ]}
+        models = []
+        for name, selected in [("jev-latest", loaded), *app.state.backends.items()]:
+            models.append({"name": name,
+                           "description": f"Local {selected.backend_name} checkpoint (Jev API compatible, not Jev weights)",
+                           "release_date": "2026-09-19" if selected.backend_name == "laya-mlx" else "2026-09-20",
+                           "backend": selected.backend_name,
+                           "checkpoint": getattr(selected, "checkpoint", None)})
+        return {"models": models}
 
     @app.post("/v1/systemone")
     async def system_one(request: DecisionRequest):
+        name = DEFAULT_MODEL if request.model == "jev-latest" else request.model
+        selected = app.state.backends.get(name)
+        if selected is None:
+            raise HTTPException(status_code=422, detail=f"unsupported model: {request.model}")
         questions = {key: value.model_dump(exclude_none=True) for key, value in request.questions.items()}
 
         def evaluate():
             with app.state.inference_lock:
-                return app.state.backend.evaluate(request.state, questions)
+                return selected.evaluate(request.state, questions)
 
         try:
             return await run_in_threadpool(evaluate)

@@ -41,3 +41,31 @@ def test_validation_and_overlength_are_explicit():
         malformed = request()
         malformed["questions"]["yes"]["type"] = "choice"
         assert client.post("/v1/systemone", json=malformed).status_code == 422
+
+
+def test_model_name_routes_both_engines_without_changing_legacy_alias():
+    class OtherBackend(FakeBackend):
+        backend_name = "laya-coreml"
+        model_name = "laya-multilingual-coreml"
+
+    class ShortBackend(OtherBackend):
+        model_name = "laya-multilingual-coreml-ane"
+
+        def evaluate(self, state, questions):
+            if state == "too long":
+                raise InputTooLong("96 token limit")
+            return super().evaluate(state, questions)
+
+    backends = {b.model_name: b for b in (FakeBackend(), OtherBackend(), ShortBackend())}
+    with TestClient(create_app(backends=backends)) as client:
+        listed = client.get("/v1/models").json()["models"]
+        assert {m["name"] for m in listed} == {"jev-latest", *backends}
+        assert client.post("/v1/systemone", json=request()).json()["model"] == "laya-multilingual-mlx"
+        for model in ("laya-multilingual-coreml", "laya-multilingual-coreml-ane"):
+            answer = client.post("/v1/systemone", json=request(model=model))
+            assert answer.status_code == 200
+            assert answer.json()["model"] == model
+        assert client.post("/v1/systemone", json=request(model="no-such-model")).status_code == 422
+        too_long = client.post("/v1/systemone", json=request("too long", ShortBackend.model_name))
+        assert too_long.status_code == 422
+        assert "96 token" in too_long.json()["detail"]
