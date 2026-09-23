@@ -30,15 +30,41 @@ Pythonを使い、依存関係と実行環境の管理には `uv`、HTTP APIに�
 
 APIサーバの構造や互換性の扱いは、先行実装の `laya-serve` を参考にする。ただし、対応バックエンドとAPI契約はこのリポジトリで明示的に管理する。
 
+## 起動とiPhoneでの確認
+
+Apple SiliconのMacとPython 3.11以降を使う。初回はモデルの重みをHugging Faceから取得する。
+
+```bash
+uv sync --extra test
+uv run pytest -q
+```
+
+Macだけで試すなら `uv run jev-systemone-local` で起動し、`http://127.0.0.1:8017/` を開く。iPhoneからTailscale経由で試すときはMacのTailscale IPv4アドレスだけで待ち受ける：
+
+```bash
+tailscale ip -4
+uv run jev-systemone-local --host <MacのTailscale IPv4> --port 8017
+```
+
+iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面の「判断する」を押すと、入力内容をこのMacのLaya-MLXで判定する。同じサーバの `/snake` では、Laya同梱のSnakeの盤面と各手の推論を確認できる。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
+
+## Snakeデモ
+
+`/snake` では「開始」「一時停止」「新しいゲーム」、速度の上限を操作できる。盤面、方向ごとのモデル確率、モデルの第一候補、実行した方向、安全補助の介入、推論時間を表示する。判定は各手で実際のMac上のLaya-MLXによって行われる。ゲームのルールと安全補助の判定は `laya-mlx` 同梱の `SnakeGame` と `LayaPolicy` を利用し、読み込んだMLXモデルは文章判定APIと共有する。
+
+安全補助は元デモの既定どおり有効。元デモと同様にモデルは安全性や餌への進路の説明を入力として受けるので、盤面だけから戦略を学習した例ではない。画面に表示する確率はモデルの実出力で、移動後の盤面に添える「直前の判断」として扱う。推定値は校正された死亡確率ではない。ゲームはサーバのメモリに最大16件保持し、1時間操作がなければ期限切れになる。サーバ再起動でも失われる。速度の数値は上限であり、推論や通信が遅ければそれ以下になる。
+
 ## API
 
-予定している主なエンドポイント：
+- `GET /`：スマートフォンでも使える判断デモ。入力文と質問JSONを編集できる。
+- `POST /v1/systemone`：TypeSafeの`state`、`model`、`questions`形式。`choice`、`score`、`noul`を扱う。
+- `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。
+- `GET /healthz`：モデルの読み込みが完了してから`ready`を返す。
+- `GET /docs`：FastAPIの対話的なAPI仕様。
 
-- `POST /v1/systemone`
-- `GET /v1/models`
-- `GET /healthz`
+公式Python SDKからは`TypeSafeClient(api_key="local-demo", base_url="http://127.0.0.1:8017")`を使える。ローカルサーバはAPIキーを検証しない。`model`応答には実際に判定した`laya-multilingual-mlx`を返す。
 
-詳細なリクエスト・レスポンス契約は、実装前にSystem One互換性を確認して定義する。
+Layaの多言語チェックポイントは最大1,024トークン。state全体が収まらないときは黙って切り詰めず422を返す。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
 
 ## 動作確認
 
@@ -74,4 +100,4 @@ APIサーバの構造や互換性の扱いは、先行実装の `laya-serve` を
 
 ## 開発状況
 
-リポジトリの初期作成と方針の記録のみ。サーバ実装はこれから。
+`laya-mlx` のHTTP APIとWebデモを実装。`laya-coreml` と `laya-onnx` は未対応。iPhone実機での操作確認はこれから。
