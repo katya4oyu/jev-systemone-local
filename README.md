@@ -56,7 +56,7 @@ APIサーバの構造や互換性の扱いは、先行実装の `laya-serve` を
 ### Jev互換サーバ
 
 - [`laya-serve`](https://pypi.org/project/laya-serve/) — Layaの重みをローカルで読み込み、`POST /v1/systemone`、`GET /v1/models`、`GET /healthz` を提供する先行実装。エンドポイント構成、モデル名の扱い、入力検証、エラー応答、preloadやAPIキーなどのサーバ運用面を参考にする。
-- [`jev-compatible-server`](https://github.com/Hanno-Labs/jev-compatible-server) — オープンな意思決定モデルをJev互換APIで提供する別実装。複数の推論バックエンドを共通のtyped decision APIへ適合する設計、`choice`・`score`・`noul` の部分対応、対応不能な質問を明示する考え方を参考にする。
+- [`jev-compatible-server`](https://github.com/Hanno-Labs/jev-compatible-server) — 困ったときに確認する参考実装。複数の推論バックエンドを共通のtyped decision APIへ適合する設計、`choice`・`score`・`noul` の部分対応、対応不能な質問を明示する考え方を参考にする。ただし、このリポジトリの実装土台や対応backendの正本にはしない。
 
 ### Layaの各バックエンド
 
