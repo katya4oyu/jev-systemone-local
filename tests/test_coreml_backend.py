@@ -39,3 +39,5 @@ def test_coreml_adapter_returns_model_identity_and_rejects_ane_overflow():
     with pytest.raises(InputTooLong, match="only .* fit"):
         backend.evaluate("word " * 100, questions)
     assert backend.agent is agent
+    assert agent.cfg["max_len"] == 1024
+    assert agent.shape["max_length"] == 96
