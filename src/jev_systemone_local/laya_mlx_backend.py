@@ -23,6 +23,12 @@ class LayaMLXBackend:
 
         self.checkpoint = checkpoint
         self.agent = laya_mlx.load(checkpoint)
+        # The multilingual checkpoint ships a 1,024-token training default, but
+        # its encoder supports 8,192. This changes only this agent's runtime
+        # budget; weights, cached config files and Core ML limits stay unchanged.
+        self.agent.cfg["max_len"] = min(
+            8192, self.agent.encoder_cfg["max_position_embeddings"],
+        )
 
     def evaluate(self, state: str | dict | list, questions: dict[str, dict]) -> dict[str, Any]:
         # Laya's build_sequence truncates state without alerting its caller. A decision

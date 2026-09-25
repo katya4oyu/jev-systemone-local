@@ -65,7 +65,9 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 
 公式Python SDKからは`TypeSafeClient(api_key="local-demo", base_url="http://127.0.0.1:8017")`を使える。ローカルサーバはAPIキーを検証しない。リクエストの`model`で推論先を選び、応答には実際に判定したモデル名を返す。Snakeの`POST /snake/api/sessions`も任意の`{"model":"laya-multilingual-coreml-ane"}`を受け付け、省略時は従来どおりMLXを使う。
 
-MLXと汎用Core MLのモデルは最大1,024トークン、Neural Engine用の`laya-multilingual-coreml-ane`は最大96トークン。state全体が質問の接頭辞とともに収まらないときは黙って切り詰めず422を返す。モデル間の暗黙の切り替えはしない。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
+MLXのモデルは最大8,192トークン、汎用Core MLは最大1,024トークン、Neural Engine用の`laya-multilingual-coreml-ane`は最大96トークン。上限にはstateだけでなく質問、選択肢、特殊トークンも含む。MLXは既存の重みを使い、実行時の`max_len`だけを拡張する。短文を上限まで埋めて計算することはないが、実際の入力が長くなると推論時間とメモリ使用量は増える。多言語モデルの学習時の長さは1,024トークンであり、8,192トークン全域での判断精度を保証するものではない（[本家の長文対応と検証結果](https://github.com/NandhaKishorM/laya/blob/23a17522aa4942da6cce53a995a275760320b691/README.md)）。
+
+state全体が質問の接頭辞とともに収まらないときは黙って切り詰めず422を返す。モデル間の暗黙の切り替えはしない。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
 
 ## 動作確認
 
