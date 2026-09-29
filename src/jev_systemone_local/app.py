@@ -12,7 +12,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from starlette.concurrency import run_in_threadpool
 
+from .extra_models import load_extra_backends, load_proxy_backends
 from .laya_mlx_backend import InputTooLong, LayaMLXBackend
+from .proxy_backend import ProxyBackend, UpstreamError
+from .recommend import TASKS, catalog_view, recommend
 from .snake_demo import FinishedGame, SnakeService, UnknownGame, policy_for_backend
 
 JsonValue = str | dict[str, Any] | list[Any]
@@ -57,6 +60,32 @@ class DecisionRequest(BaseModel):
         return self
 
 
+CONSTRAINT_KEYS = {"local_only", "low_latency", "long_text", "negation", "many_labels"}
+
+
+class RecommendRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(min_length=1, max_length=4000)
+    task: str | None = None
+    constraints: dict[str, Any] | None = None
+    available_only: bool = False
+    limit: int = Field(3, ge=1, le=7)
+
+    @model_validator(mode="after")
+    def validate_recommend(self) -> RecommendRequest:
+        if not self.text.strip():
+            raise ValueError("text must not be empty")
+        if self.task is not None and self.task not in TASKS:
+            raise ValueError(f"task must be one of {sorted(TASKS)}")
+        unknown = set(self.constraints or {}) - CONSTRAINT_KEYS
+        if unknown:
+            raise ValueError(f"unknown constraints {sorted(unknown)}; expected {sorted(CONSTRAINT_KEYS)}")
+        many = (self.constraints or {}).get("many_labels")
+        if many is not None and (isinstance(many, bool) or not isinstance(many, int) or many < 1):
+            raise ValueError("many_labels must be a positive integer")
+        return self
+
+
 class SnakeStartRequest(BaseModel):
     model: str = DEFAULT_MODEL
 
@@ -86,6 +115,13 @@ def create_app(backend: Any = None, snake_policy: Any = None,
             name: policy_for_backend(selected)
             for name, selected in app.state.backends.items() if hasattr(selected, "agent")
         }
+        if backends is None and backend is None:
+            # Extra checkpoints (JEV_LOCAL_MLX_MODELS) are decision models only; the Snake demo keeps
+            # using the built-in models it was validated with.
+            app.state.backends.update(
+                load_extra_backends(set(app.state.backends), LayaMLXBackend))
+            app.state.backends.update(
+                load_proxy_backends(set(app.state.backends), ProxyBackend))
         if snake_policy is not None:
             policies[DEFAULT_MODEL] = snake_policy
         app.state.snake = SnakeService(policies[DEFAULT_MODEL], policies=policies) if policies else None
@@ -139,7 +175,8 @@ def create_app(backend: Any = None, snake_policy: Any = None,
         models = []
         for name, selected in [("jev-latest", loaded), *app.state.backends.items()]:
             models.append({"name": name,
-                           "description": f"Local {selected.backend_name} checkpoint (Jev API compatible, not Jev weights)",
+                           "description": getattr(selected, "description", None)
+                           or f"Local {selected.backend_name} checkpoint (Jev API compatible, not Jev weights)",
                            "release_date": "2026-09-19" if selected.backend_name == "laya-mlx" else "2026-09-20",
                            "backend": selected.backend_name,
                            "checkpoint": getattr(selected, "checkpoint", None)})
@@ -154,12 +191,34 @@ def create_app(backend: Any = None, snake_policy: Any = None,
         questions = {key: value.model_dump(exclude_none=True) for key, value in request.questions.items()}
 
         def evaluate():
+            if not getattr(selected, "needs_lock", True):  # proxies: the upstream process does its own queueing
+                return selected.evaluate(request.state, questions)
             with app.state.inference_lock:
                 return selected.evaluate(request.state, questions)
 
         try:
             return await run_in_threadpool(evaluate)
         except (InputTooLong, ValueError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except UpstreamError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+
+    @app.get("/v1/recommend/catalog")
+    def recommend_catalog():
+        """Not part of the Jev API: the capability catalog behind /v1/recommend."""
+        return catalog_view(set(app.state.backends))
+
+    @app.post("/v1/recommend")
+    def recommend_model(request: RecommendRequest):
+        """Not part of the Jev API: describe what you want to do, get the model that fits.
+
+        Pure CPU work (a small n-gram classifier), so it never touches the decision models or their lock.
+        """
+        try:
+            return recommend(request.text, set(app.state.backends), task=request.task,
+                             constraints=request.constraints, available_only=request.available_only,
+                             limit=request.limit)
+        except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return app

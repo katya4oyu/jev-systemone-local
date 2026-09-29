@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+from pathlib import Path
 from typing import Any
 
 from laya_mlx import common as mlx_common
@@ -18,17 +19,24 @@ class LayaMLXBackend:
     model_name = "laya-multilingual-mlx"
     common = mlx_common
 
-    def __init__(self, checkpoint: str = "aac6fef/laya-multilingual-mlx") -> None:
+    def __init__(self, checkpoint: str = "aac6fef/laya-multilingual-mlx",
+                 model_name: str | None = None, extend_context: bool = True) -> None:
         import laya_mlx
 
-        self.checkpoint = checkpoint
+        # /v1/models reports this; never expose a local absolute path to clients.
+        self.checkpoint = f"local:{Path(checkpoint).name}" if Path(checkpoint).expanduser().exists() else checkpoint
+        if model_name is not None:
+            self.model_name = model_name
         self.agent = laya_mlx.load(checkpoint)
-        # The multilingual checkpoint ships a 1,024-token training default, but
-        # its encoder supports 8,192. This changes only this agent's runtime
-        # budget; weights, cached config files and Core ML limits stay unchanged.
-        self.agent.cfg["max_len"] = min(
-            8192, self.agent.encoder_cfg["max_position_embeddings"],
-        )
+        if extend_context:
+            # The multilingual checkpoint ships a 1,024-token training default, but
+            # its encoder supports 8,192. This changes only this agent's runtime
+            # budget; weights, cached config files and Core ML limits stay unchanged.
+            # Fine-tuned checkpoints keep the length they were trained with instead
+            # (extend_context=False): nothing validates them beyond it.
+            self.agent.cfg["max_len"] = min(
+                8192, self.agent.encoder_cfg["max_position_embeddings"],
+            )
 
     def evaluate(self, state: str | dict | list, questions: dict[str, dict]) -> dict[str, Any]:
         # Laya's build_sequence truncates state without alerting its caller. A decision

@@ -1,0 +1,145 @@
+{
+ "task_accuracy_classifier_only": {
+  "all": 0.892,
+  "dev": 0.917,
+  "test": 0.867
+ },
+ "task_accuracy": {
+  "all": 0.908,
+  "dev": 0.917,
+  "test": 0.9
+ },
+ "per_task": {
+  "turn_taking": 0.92,
+  "memory": 0.83,
+  "topic_shift": 1.0,
+  "classify": 0.5,
+  "classify_many": 0.75,
+  "moderation": 1.0,
+  "rating": 0.92,
+  "timeseries": 1.0,
+  "relevance": 1.0,
+  "other": 1.0
+ },
+ "confusions": [
+  [
+   "classify->classify_many",
+   5
+  ],
+  [
+   "memory->moderation",
+   2
+  ],
+  [
+   "turn_taking->moderation",
+   1
+  ],
+  [
+   "classify->timeseries",
+   1
+  ],
+  [
+   "classify_many->other",
+   1
+  ],
+  [
+   "classify_many->classify",
+   1
+  ],
+  [
+   "classify_many->turn_taking",
+   1
+  ],
+  [
+   "rating->other",
+   1
+  ]
+ ],
+ "mean_confidence": {
+  "right": 0.736,
+  "wrong": 0.373
+ },
+ "accuracy_when_confidence>=0.5": {
+  "n": 88,
+  "acc": 0.977
+ },
+ "accuracy_when_confidence>=0.7": {
+  "n": 72,
+  "acc": 1.0
+ },
+ "flags_dev": {
+  "local_only": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 8,
+   "fp": 0,
+   "fn": 0
+  },
+  "low_latency": {
+   "precision": 1.0,
+   "recall": 0.8,
+   "tp": 4,
+   "fp": 0,
+   "fn": 1
+  },
+  "long_text": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 6,
+   "fp": 0,
+   "fn": 0
+  },
+  "negation": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 0
+  },
+  "many_labels": {
+   "precision": 1.0,
+   "recall": 0.67,
+   "tp": 4,
+   "fp": 0,
+   "fn": 2
+  }
+ },
+ "flags_test": {
+  "local_only": {
+   "precision": 1.0,
+   "recall": 0.88,
+   "tp": 7,
+   "fp": 0,
+   "fn": 1
+  },
+  "low_latency": {
+   "precision": 1.0,
+   "recall": 0.67,
+   "tp": 6,
+   "fp": 0,
+   "fn": 3
+  },
+  "long_text": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 4,
+   "fp": 0,
+   "fn": 0
+  },
+  "negation": {
+   "precision": 0.5,
+   "recall": 0.33,
+   "tp": 1,
+   "fp": 1,
+   "fn": 2
+  },
+  "many_labels": {
+   "precision": 1.0,
+   "recall": 0.6,
+   "tp": 6,
+   "fp": 0,
+   "fn": 4
+  }
+ },
+ "ms_per_request": 0.05
+}
