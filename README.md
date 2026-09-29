@@ -1,6 +1,17 @@
-# jev-systemone-local
+# systemone-workbench
 
-ローカルで動作する、Jev互換のSystem One APIサーバ。
+Apple SiliconのMac上で、System Oneモデル（高速に型付きの判断を返す小型モデル）を提供・比較・推薦・評価・微調整するための作業台。
+
+System Oneモデルは、選択肢から選ぶ（`choice`）、段階で評価する（`score`）、はい／いいえを確率で返す（`noul`）判断を、生成なしの1回の推論で返す。TypeSafeのJev、Laya、Jeff、Kevなどがこの種類にあたる。
+
+- **提供**：LayaをMLX・Core MLで動かし、Jev互換の`/v1/systemone`として公開する（公式SDKからそのまま使える）。微調整したチェックポイントも登録できる
+- **転送**：別プロセスのJeff・Kevなど、Jev互換サーバを`model`名で使えるようにする
+- **推薦**：やりたいことを文章で送ると、どのモデルを使うべきかを返す（`/v1/recommend`）
+- **評価**：日本語の自作データで、Jev・Laya・Jeff・Kevを同じ条件で比べる（`eval/ja/`）
+- **微調整**：Layaの公式手順をApple Siliconで動かす（`eval/finetune/`）
+- **調査**：結果と根拠は [調査メモ](docs/research/jev-vs-laya-case-studies.md) にまとめている
+
+動作はApple SiliconのMacが前提。Jev本体（TypeSafe）とは無関係の独立したプロジェクトで、Jevの重みは含まない。旧名は`jev-systemone-local`で、旧コマンド名`jev-systemone-local`と、旧環境変数`JEV_LOCAL_MLX_MODELS`・`JEV_LOCAL_PROXY_MODELS`も当面は使える（新旧の値が食い違うとエラーにする）。
 
 ## 方針
 
@@ -39,11 +50,11 @@ uv sync --extra test
 uv run pytest -q
 ```
 
-Macだけで試すなら `uv run jev-systemone-local` で起動し、`http://127.0.0.1:8017/` を開く。iPhoneからTailscale経由で試すときはMacのTailscale IPv4アドレスだけで待ち受ける：
+Macだけで試すなら `uv run systemone` で起動し、`http://127.0.0.1:8017/` を開く。iPhoneからTailscale経由で試すときはMacのTailscale IPv4アドレスだけで待ち受ける：
 
 ```bash
 tailscale ip -4
-uv run jev-systemone-local --host <MacのTailscale IPv4> --port 8017
+uv run systemone --host <MacのTailscale IPv4> --port 8017
 ```
 
 iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSafariで開く。画面は同一サーバから配信するTypeSafe公式JavaScript SDK v0.6.0を使い、`models.list()` と `systemOne()` でMLXまたはCore MLの判定を呼び出す。ブラウザ用にはローカルサーバが検証しないダミーキーだけを指定する。実際のAPIキーをブラウザへ渡さない。同じサーバの `/snake` は独自のゲームAPIを使うため、SDK互換性の確認対象ではない。サーバにアプリ独自の認証はないため、公開ネットワークへはバインドしない。ブラウザとAPIの通信はHTTPであり、秘匿すべき文章を入力しない。
@@ -57,7 +68,7 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 ## API
 
 - `GET /`：公式JavaScript SDK経由で動く判断デモ。入力文と質問JSONを編集できる。
-- `GET /vendor/typesafe-sdk.mjs`：同一サーバから配信する公式SDK v0.6.0のESM配布物（MITライセンスは `src/jev_systemone_local/vendor/LICENSE.typesafe-sdk`）。
+- `GET /vendor/typesafe-sdk.mjs`：同一サーバから配信する公式SDK v0.6.0のESM配布物（MITライセンスは `src/systemone_workbench/vendor/LICENSE.typesafe-sdk`）。
 - `POST /v1/systemone`：TypeSafeの`state`、`model`、`questions`形式。`choice`、`score`、`noul`を扱う。
 - `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。ほかに`laya-multilingual-coreml`と`laya-multilingual-coreml-ane`を公開する。設定すれば、微調整したモデルと、Jeff・Kevなど別サーバへの転送も並ぶ（下記）。
 - `GET /healthz`：モデルの読み込みが完了してから`ready`を返す。
@@ -88,14 +99,14 @@ curl -s localhost:8017/v1/recommend -H 'content-type: application/json' -d '{
 
 ## Jeff・Kevなど別のJev互換サーバをつなぐ
 
-別のプロセスで動かしているJev互換サーバ（[Jeff](https://github.com/firelex/jeff)、[Kev](https://github.com/jaredpalmer/kev)など）を、環境変数 `JEV_LOCAL_PROXY_MODELS` で登録すると、リクエストの`model`名でこのサーバから使える。書式は `名前=URL[|上流のモデル名]` をカンマ区切りにしたもの。
+別のプロセスで動かしているJev互換サーバ（[Jeff](https://github.com/firelex/jeff)、[Kev](https://github.com/jaredpalmer/kev)など）を、環境変数 `SYSTEMONE_PROXY_MODELS` で登録すると、リクエストの`model`名でこのサーバから使える。書式は `名前=URL[|上流のモデル名]` をカンマ区切りにしたもの。
 
 ```bash
 # 別のターミナルでそれぞれ起動しておく
 python -m kev.serve --run jaredpalmer/kev-4b --port 8009                       # Kev（jaredpalmer/kev）
 JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeffのチェックポイント> PORT=8765 jeff-serve  # Jeff（firelex/jeff）
 
-JEV_LOCAL_PROXY_MODELS="kev-4b=http://127.0.0.1:8009,jeff-2b=http://127.0.0.1:8765" uv run jev-systemone-local
+SYSTEMONE_PROXY_MODELS="kev-4b=http://127.0.0.1:8009,jeff-2b=http://127.0.0.1:8765" uv run systemone
 ```
 
 上流のモデル名を省くと、名前の先頭部分から `kev-latest`、`jeff-latest` を使う（それ以外は `jev-latest`）。名前は `/v1/recommend` のカタログと同じ `kev-4b`、`kev-0.8b`、`jeff-2b`、`jeff-0.8b` にすると、おすすめAPIが利用可能なモデルとして扱い、`available_only`でも残る。
@@ -104,14 +115,14 @@ JEV_LOCAL_PROXY_MODELS="kev-4b=http://127.0.0.1:8009,jeff-2b=http://127.0.0.1:87
 
 ## 微調整したモデルを載せる
 
-Layaを自前データで微調整したチェックポイントは、環境変数 `JEV_LOCAL_MLX_MODELS` で追加のモデルとして公開できる。書式は `名前=チェックポイント` をカンマ区切りにしたもので、チェックポイントはローカルのディレクトリかHugging Faceのid。
+Layaを自前データで微調整したチェックポイントは、環境変数 `SYSTEMONE_MLX_MODELS` で追加のモデルとして公開できる。書式は `名前=チェックポイント` をカンマ区切りにしたもので、チェックポイントはローカルのディレクトリかHugging Faceのid。
 
 ```bash
 # 1. 微調整（eval/finetune/、PyTorchが必要）→ 出力ディレクトリ ft_out
 # 2. MLX形式へ変換（既存の出力先には書き込まない）
 uv run laya-mlx convert --model ft_out --output ~/models/laya-ja-turn-mlx
 # 3. 追加モデルとして起動
-JEV_LOCAL_MLX_MODELS="laya-ja-turn-mlx=$HOME/models/laya-ja-turn-mlx" uv run jev-systemone-local
+SYSTEMONE_MLX_MODELS="laya-ja-turn-mlx=$HOME/models/laya-ja-turn-mlx" uv run systemone
 ```
 
 リクエストの`model`に `laya-ja-turn-mlx` を指定すると、そのモデルで判定する。`/v1/models`にも並び、`jev-latest`は従来どおり`laya-multilingual-mlx`のまま変わらない。名前が既存のモデルや`jev-latest`と重なる場合、書式が不正な場合、チェックポイントを読み込めない場合は、無視せず起動に失敗する。ローカルの絶対パスは`/v1/models`に出さず`local:<ディレクトリ名>`と表示する。Snakeデモには追加モデルを使わない。
@@ -156,7 +167,7 @@ JEV_LOCAL_MLX_MODELS="laya-ja-turn-mlx=$HOME/models/laya-ja-turn-mlx" uv run jev
 
 ## ライセンス
 
-本リポジトリのコードは [MIT License](LICENSE) で公開する。同梱するTypeSafe公式JavaScript SDKには、別途 [TypeSafeのMITライセンス](src/jev_systemone_local/vendor/LICENSE.typesafe-sdk) が適用される。
+本リポジトリのコードは [MIT License](LICENSE) で公開する。同梱するTypeSafe公式JavaScript SDKには、別途 [TypeSafeのMITライセンス](src/systemone_workbench/vendor/LICENSE.typesafe-sdk) が適用される。
 
 ## 開発状況
 

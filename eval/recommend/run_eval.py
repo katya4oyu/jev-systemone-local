@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from requests_ja import REQUESTS  # noqa: E402
 
-from jev_systemone_local import recommend as R  # noqa: E402
+from systemone_workbench import recommend as R  # noqa: E402
 
 seen = defaultdict(int)
 rows = []

@@ -6,8 +6,8 @@ from fastapi.testclient import TestClient
 from laya_mlx.snake.game import DIRECTIONS
 from laya_mlx.snake.policy import Decision
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.snake_demo import SnakeService, policy_for_backend
+from systemone_workbench.app import create_app
+from systemone_workbench.snake_demo import SnakeService, policy_for_backend
 
 
 class FakePolicy:

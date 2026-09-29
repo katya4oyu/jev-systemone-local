@@ -1,9 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.intent_classifier import load_classifier
-from jev_systemone_local.recommend import CATALOG, TASKS, detect_constraints, detect_task, rank_models, recommend
+from systemone_workbench.app import create_app
+from systemone_workbench.intent_classifier import load_classifier
+from systemone_workbench.recommend import CATALOG, TASKS, detect_constraints, detect_task, rank_models, recommend
 
 
 def test_classifier_knows_every_task_and_returns_a_distribution():

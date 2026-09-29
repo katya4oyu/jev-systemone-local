@@ -34,7 +34,7 @@
 
 ## 4. 日本語のローカル実測
 
-条件: Apple Silicon、本リポジトリのサーバ、`laya-multilingual-*` の3バックエンド。データは手書きの小規模セット(choice 24件、noul 20件、score 10件)。**n が小さいので ±10pt 程度の差は誤差**。jev は第6・7節で同じ入力を実測(第7節)。再現: `uv run jev-systemone-local` 起動後に `uv run python eval/ja/run.py`(`eval/ja/results.json` に全数値)。
+条件: Apple Silicon、本リポジトリのサーバ、`laya-multilingual-*` の3バックエンド。データは手書きの小規模セット(choice 24件、noul 20件、score 10件)。**n が小さいので ±10pt 程度の差は誤差**。jev は第6・7節で同じ入力を実測(第7節)。再現: `uv run systemone` 起動後に `uv run python eval/ja/run.py`(`eval/ja/results.json` に全数値)。
 
 ### 遅延(ウォーム時、単発 / 5問バッチ p50)
 MLX 7.2ms / 14.9ms、Core ML 7.9ms / 34.1ms、Core ML-ANE 4.8ms / 21.4ms。文献の11–40msと整合、Jev の約240ms+より1桁以上速い。
@@ -210,7 +210,7 @@ Pearson r = 0.96(数値は順序をよく反映)、MAE 0.45。一方、確率の
 - 学習データと評価データは、どちらも Claude が書いた自作の会話文。実際のユーザー発話や ASR 誤りとは分布が違う可能性が高く、**実運用の精度はこの数字より低いと見るべき**。EOU の学習データは、完結側が継続側より長い(平均11 vs 8文字)ため、長さが手がかりになった可能性もある。
 - 件数が少なく、1回の訓練・1シードのみ。ばらつきは未測定。
 - 発話区切りは、断片(途中で切った文)に対する精度が 0.82〜0.87 に留まる。リアルタイムの区切り判定には、さらに ASR 由来のデータでの学習が要る。
-- 重み(約650MB)はリポジトリに含めていない。再現は `eval/finetune/` の3スクリプト(`build_items.py` → `train.py` → `eval_ft.py`)。`laya-mlx convert` で MLX 形式に変換でき、このリポジトリのサーバに `JEV_LOCAL_MLX_MODELS` で追加できる(README「微調整したモデルを載せる」)。MLX サーバ経由の評価は PyTorch と同じ精度、単発 7.5ms だった。
+- 重み(約650MB)はリポジトリに含めていない。再現は `eval/finetune/` の3スクリプト(`build_items.py` → `train.py` → `eval_ft.py`)。`laya-mlx convert` で MLX 形式に変換でき、このリポジトリのサーバに `SYSTEMONE_MLX_MODELS` で追加できる(README「微調整したモデルを載せる」)。MLX サーバ経由の評価は PyTorch と同じ精度、単発 7.5ms だった。
 
 ## 9. Jeff / Kev のローカル実測(2026-09-30)
 

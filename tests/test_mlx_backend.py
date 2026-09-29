@@ -5,8 +5,8 @@ import pytest
 from fastapi.testclient import TestClient
 from laya_mlx.agent import Agent
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.laya_mlx_backend import LayaMLXBackend
+from systemone_workbench.app import create_app
+from systemone_workbench.laya_mlx_backend import LayaMLXBackend
 
 
 class Tokens:

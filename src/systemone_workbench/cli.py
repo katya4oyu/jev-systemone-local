@@ -1,4 +1,4 @@
-"""Start the local decision server."""
+"""Start the System One Workbench server."""
 
 import argparse
 
@@ -8,7 +8,7 @@ from .app import create_app
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Serve Laya-MLX through the System One API")
+    parser = argparse.ArgumentParser(description="Serve System One decision models (Laya MLX / Core ML, plus registered checkpoints and proxies)")
     parser.add_argument("--host", default="127.0.0.1", help="Bind to this IP; use your Tailscale IP for iPhone access")
     parser.add_argument("--port", type=int, default=8017)
     args = parser.parse_args()

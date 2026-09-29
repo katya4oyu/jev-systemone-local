@@ -2,9 +2,9 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.extra_models import load_proxy_backends, parse_proxy_spec
-from jev_systemone_local.proxy_backend import ProxyBackend, UpstreamError
+from systemone_workbench.app import create_app
+from systemone_workbench.extra_models import load_proxy_backends, parse_proxy_spec
+from systemone_workbench.proxy_backend import ProxyBackend, UpstreamError
 from test_app import FakeBackend, request
 
 

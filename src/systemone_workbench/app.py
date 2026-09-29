@@ -116,7 +116,7 @@ def create_app(backend: Any = None, snake_policy: Any = None,
             for name, selected in app.state.backends.items() if hasattr(selected, "agent")
         }
         if backends is None and backend is None:
-            # Extra checkpoints (JEV_LOCAL_MLX_MODELS) are decision models only; the Snake demo keeps
+            # Extra checkpoints (SYSTEMONE_MLX_MODELS) are decision models only; the Snake demo keeps
             # using the built-in models it was validated with.
             app.state.backends.update(
                 load_extra_backends(set(app.state.backends), LayaMLXBackend))
@@ -127,7 +127,7 @@ def create_app(backend: Any = None, snake_policy: Any = None,
         app.state.snake = SnakeService(policies[DEFAULT_MODEL], policies=policies) if policies else None
         yield
 
-    app = FastAPI(title="Jev System One Local", lifespan=lifespan)
+    app = FastAPI(title="System One Workbench", lifespan=lifespan)
 
     @app.get("/", include_in_schema=False)
     def playground():
