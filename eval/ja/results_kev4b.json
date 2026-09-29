@@ -1,0 +1,226 @@
+{
+ "latency": {
+  "laya-multilingual-mlx": {
+   "single": {
+    "p50_ms": 47.0,
+    "p95_ms": 50.7
+   },
+   "batch5": {
+    "p50_ms": 149.0,
+    "p95_ms": 151.1
+   }
+  }
+ },
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.047,
+    "mean_conf": 0.953
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.08,
+    "mean_conf": 0.92
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.07,
+    "mean_conf": 0.93
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.119,
+    "mean_conf": 0.881
+   },
+   "50": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.323,
+    "mean_conf": 0.677
+   }
+  }
+ },
+ "label_language": {
+  "ja_labels": 1.0,
+  "en_labels": 1.0
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.137,
+   "mean_conf": 0.863,
+   "mean_p_aggr_on_aggr": 0.759,
+   "mean_p_aggr_on_benign": 0.034
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.178,
+   "mean_conf": 0.822,
+   "mean_p_aggr_on_aggr": 0.773,
+   "mean_p_aggr_on_benign": 0.129
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.95,
+   "ece": 0.146,
+   "mean_conf": 0.858,
+   "mean_p_aggr_on_aggr": 0.742,
+   "mean_p_aggr_on_benign": 0.034
+  }
+ },
+ "score": {
+  "pearson_r": 0.983,
+  "mae": 0.194,
+  "argmax_level_counts(gold=2 each)": [
+   2,
+   2,
+   2,
+   0,
+   4
+  ],
+  "scores": [
+   0.03,
+   0.08,
+   0.89,
+   0.67,
+   2.01,
+   1.98,
+   3.54,
+   3.65,
+   3.92,
+   3.91
+  ]
+ },
+ "context": {
+  "laya-multilingual-mlx": {
+   "300/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.085,
+    "mean_conf": 0.915,
+    "input_tokens": 104
+   },
+   "300/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.085,
+    "mean_conf": 0.915,
+    "input_tokens": 104
+   },
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.067,
+    "mean_conf": 0.933,
+    "input_tokens": 508
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.059,
+    "mean_conf": 0.941,
+    "input_tokens": 508
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.068,
+    "mean_conf": 0.932,
+    "input_tokens": 811
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.06,
+    "mean_conf": 0.94,
+    "input_tokens": 811
+   },
+   "2000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.071,
+    "mean_conf": 0.929,
+    "input_tokens": 1821
+   },
+   "2000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.06,
+    "mean_conf": 0.94,
+    "input_tokens": 1821
+   },
+   "4000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.069,
+    "mean_conf": 0.931,
+    "input_tokens": 3841
+   },
+   "4000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.058,
+    "mean_conf": 0.942,
+    "input_tokens": 3841
+   },
+   "6000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.051,
+    "mean_conf": 0.949,
+    "input_tokens": 5862
+   },
+   "6000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.038,
+    "mean_conf": 0.962,
+    "input_tokens": 5862
+   },
+   "8000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.051,
+    "mean_conf": 0.949,
+    "input_tokens": 7882
+   },
+   "8000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.038,
+    "mean_conf": 0.962,
+    "input_tokens": 7882
+   }
+  },
+  "tokens_per_filler": 100.9
+ }
+}

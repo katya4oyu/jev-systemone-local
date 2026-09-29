@@ -1,0 +1,377 @@
+{
+ "latency": {
+  "laya-multilingual-mlx": {
+   "single": {
+    "p50_ms": 7.2,
+    "p95_ms": 8.5
+   },
+   "batch5": {
+    "p50_ms": 14.9,
+    "p95_ms": 31.7
+   }
+  },
+  "laya-multilingual-coreml": {
+   "single": {
+    "p50_ms": 7.9,
+    "p95_ms": 8.4
+   },
+   "batch5": {
+    "p50_ms": 34.1,
+    "p95_ms": 36.9
+   }
+  },
+  "laya-multilingual-coreml-ane": {
+   "single": {
+    "p50_ms": 4.8,
+    "p95_ms": 5.2
+   },
+   "batch5": {
+    "p50_ms": 21.4,
+    "p95_ms": 22.0
+   }
+  }
+ },
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.096,
+    "mean_conf": 0.876
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.833,
+    "ece": 0.159,
+    "mean_conf": 0.922
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.158,
+    "mean_conf": 0.889
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.105,
+    "mean_conf": 0.847
+   },
+   "50": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.333,
+    "ece": 0.526,
+    "mean_conf": 0.859
+   }
+  },
+  "laya-multilingual-coreml": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.097,
+    "mean_conf": 0.876
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.833,
+    "ece": 0.158,
+    "mean_conf": 0.922
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.148,
+    "mean_conf": 0.89
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.105,
+    "mean_conf": 0.847
+   },
+   "50": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question exceeds the exported max_options; convert with a larger value\"}"
+   }
+  },
+  "laya-multilingual-coreml-ane": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.096,
+    "mean_conf": 0.877
+   },
+   "5": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 16 state tokens, but only 4 fit; shorten the state or criteria\"}"
+   },
+   "10": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 16 state tokens, but only 0 fit; shorten the state or criteria\"}"
+   },
+   "20": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 16 state tokens, but only 0 fit; shorten the state or criteria\"}"
+   },
+   "50": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 16 state tokens, but only 0 fit; shorten the state or criteria\"}"
+   }
+  }
+ },
+ "label_language": {
+  "ja_labels": 0.833,
+  "en_labels": 0.792
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.7,
+   "ece": 0.26,
+   "mean_conf": 0.865,
+   "mean_p_aggr_on_aggr": 0.405,
+   "mean_p_aggr_on_benign": 0.002
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.35,
+   "ece": 0.658,
+   "mean_conf": 0.866,
+   "mean_p_aggr_on_aggr": 0.646,
+   "mean_p_aggr_on_benign": 0.997
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.65,
+   "ece": 0.269,
+   "mean_conf": 0.874,
+   "mean_p_aggr_on_aggr": 0.34,
+   "mean_p_aggr_on_benign": 0.003
+  }
+ },
+ "score": {
+  "pearson_r": 0.964,
+  "mae": 0.445,
+  "argmax_level_counts(gold=2 each)": [
+   3,
+   3,
+   0,
+   0,
+   4
+  ],
+  "scores": [
+   0.21,
+   0.12,
+   0.6,
+   0.31,
+   1.1,
+   1.58,
+   2.77,
+   2.74,
+   3.82,
+   2.97
+  ]
+ },
+ "context": {
+  "laya-multilingual-mlx": {
+   "300/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.216,
+    "mean_conf": 0.787,
+    "input_tokens": 207
+   },
+   "300/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.169,
+    "mean_conf": 0.817,
+    "input_tokens": 206
+   },
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.228,
+    "mean_conf": 0.84,
+    "input_tokens": 599
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.205,
+    "mean_conf": 0.839,
+    "input_tokens": 598
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.75,
+    "ece": 0.261,
+    "mean_conf": 0.795,
+    "input_tokens": 893
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.172,
+    "mean_conf": 0.79,
+    "input_tokens": 892
+   },
+   "2000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.583,
+    "ece": 0.268,
+    "mean_conf": 0.656,
+    "input_tokens": 1873
+   },
+   "2000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.142,
+    "mean_conf": 0.757,
+    "input_tokens": 1872
+   },
+   "4000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.375,
+    "ece": 0.334,
+    "mean_conf": 0.664,
+    "input_tokens": 3833
+   },
+   "4000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.189,
+    "mean_conf": 0.781,
+    "input_tokens": 3832
+   },
+   "6000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.333,
+    "ece": 0.309,
+    "mean_conf": 0.617,
+    "input_tokens": 5892
+   },
+   "6000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.126,
+    "mean_conf": 0.791,
+    "input_tokens": 5891
+   },
+   "8000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.5,
+    "ece": 0.347,
+    "mean_conf": 0.474,
+    "input_tokens": 7852
+   },
+   "8000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.169,
+    "mean_conf": 0.792,
+    "input_tokens": 7851
+   }
+  },
+  "laya-multilingual-coreml": {
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.229,
+    "mean_conf": 0.84,
+    "input_tokens": 599
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.205,
+    "mean_conf": 0.839,
+    "input_tokens": 598
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.241,
+    "mean_conf": 0.794,
+    "input_tokens": 893
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.175,
+    "mean_conf": 0.791,
+    "input_tokens": 892
+   },
+   "1300/message_last": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 1094 state tokens, but only 932 fit; shorten the state or criteria\"}"
+   },
+   "1300/message_first": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"Question 'q' needs 1094 state tokens, but only 932 fit; shorten the state or criteria\"}"
+   }
+  },
+  "tokens_per_filler": 98.0
+ }
+}

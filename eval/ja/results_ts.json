@@ -1,0 +1,76 @@
+{
+ "timeseries": {
+  "trend/raw/len12": {
+   "n": 90,
+   "errors": 0,
+   "acc": 0.278,
+   "ece": 0.117,
+   "mean_conf": 0.161
+  },
+  "spike/raw/len12": {
+   "n": 60,
+   "errors": 0,
+   "acc": 0.5,
+   "ece": 0.5,
+   "mean_conf": 1.0
+  },
+  "trend/summary/len12": {
+   "n": 90,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.237,
+   "mean_conf": 0.763
+  },
+  "spike/summary/len12": {
+   "n": 60,
+   "errors": 0,
+   "acc": 0.85,
+   "ece": 0.111,
+   "mean_conf": 0.927
+  },
+  "trend/raw/len60": {
+   "n": 90,
+   "errors": 0,
+   "acc": 0.222,
+   "ece": 0.203,
+   "mean_conf": 0.118
+  },
+  "spike/raw/len60": {
+   "n": 60,
+   "errors": 0,
+   "acc": 0.5,
+   "ece": 0.489,
+   "mean_conf": 0.989
+  },
+  "trend/summary/len60": {
+   "n": 90,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.136,
+   "mean_conf": 0.864
+  },
+  "spike/summary/len60": {
+   "n": 60,
+   "errors": 0,
+   "acc": 0.717,
+   "ece": 0.194,
+   "mean_conf": 0.882
+  },
+  "next_up/raw": {
+   "n": 90,
+   "errors": 0,
+   "acc": 0.589,
+   "ece": 0.404,
+   "mean_conf": 0.99,
+   "baseline_last_delta_acc": 0.389
+  },
+  "next_up/summary": {
+   "n": 90,
+   "errors": 0,
+   "acc": 0.456,
+   "ece": 0.52,
+   "mean_conf": 0.976,
+   "baseline_last_delta_acc": 0.367
+  }
+ }
+}

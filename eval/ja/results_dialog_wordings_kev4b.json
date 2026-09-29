@@ -1,0 +1,140 @@
+{
+ "eou": {
+  "noul_短い": {
+   "n": 60,
+   "acc@0.5": 0.767,
+   "auc": 0.84,
+   "best_thr_acc": [
+    0.8,
+    0.45
+   ],
+   "fpr_at_recall90": 0.467,
+   "mean_p_pos": 0.554,
+   "mean_p_neg": 0.386
+  },
+  "noul_文が完結": {
+   "n": 60,
+   "acc@0.5": 0.85,
+   "auc": 0.92,
+   "best_thr_acc": [
+    0.85,
+    0.5
+   ],
+   "fpr_at_recall90": 0.233,
+   "mean_p_pos": 0.716,
+   "mean_p_neg": 0.411
+  },
+  "noul_続く": {
+   "n": 60,
+   "acc@0.5": 0.3,
+   "auc": 0.068,
+   "best_thr_acc": [
+    0.5,
+    0.95
+   ],
+   "fpr_at_recall90": 1.0,
+   "mean_p_pos": 0.287,
+   "mean_p_neg": 0.521
+  },
+  "choice_言い終わり/言いかけ": {
+   "n": 60,
+   "acc@0.5": 0.8,
+   "auc": 0.927,
+   "best_thr_acc": [
+    0.833,
+    0.65
+   ],
+   "fpr_at_recall90": 0.267,
+   "mean_p_pos": 0.774,
+   "mean_p_neg": 0.368
+  },
+  "choice_完全な文/途切れた文": {
+   "n": 60,
+   "acc@0.5": 0.8,
+   "auc": 0.877,
+   "best_thr_acc": [
+    0.833,
+    0.55
+   ],
+   "fpr_at_recall90": 0.267,
+   "mean_p_pos": 0.806,
+   "mean_p_neg": 0.392
+  }
+ },
+ "memory": {
+  "noul_個人情報": {
+   "n": 40,
+   "acc@0.5": 0.9,
+   "auc": 0.985,
+   "best_thr_acc": [
+    0.925,
+    0.35
+   ],
+   "fpr_at_recall90": 0.1,
+   "mean_p_pos": 0.709,
+   "mean_p_neg": 0.16
+  },
+  "noul_覚えて": {
+   "n": 40,
+   "acc@0.5": 0.7,
+   "auc": 0.818,
+   "best_thr_acc": [
+    0.7,
+    0.5
+   ],
+   "fpr_at_recall90": 0.55,
+   "mean_p_pos": 0.514,
+   "mean_p_neg": 0.405
+  },
+  "choice_個人的/雑談": {
+   "n": 40,
+   "acc@0.5": 1.0,
+   "auc": 1.0,
+   "best_thr_acc": [
+    1.0,
+    0.5
+   ],
+   "fpr_at_recall90": 0.0,
+   "mean_p_pos": 0.848,
+   "mean_p_neg": 0.172
+  }
+ },
+ "drift": {
+  "noul_話題が変わった(反転)": {
+   "n": 40,
+   "acc@0.5": 0.825,
+   "auc": 0.983,
+   "best_thr_acc": [
+    0.95,
+    0.3
+   ],
+   "fpr_at_recall90": 0.05,
+   "mean_p_pos": 0.532,
+   "mean_p_neg": 0.173
+  },
+  "noul_同じ話題": {
+   "n": 40,
+   "acc@0.5": 0.925,
+   "auc": 1.0,
+   "best_thr_acc": [
+    1.0,
+    0.65
+   ],
+   "fpr_at_recall90": 0.0,
+   "mean_p_pos": 0.848,
+   "mean_p_neg": 0.185
+  },
+  "choice_同/別": {
+   "n": 40,
+   "acc@0.5": 0.975,
+   "auc": 0.998,
+   "best_thr_acc": [
+    0.975,
+    0.75
+   ],
+   "fpr_at_recall90": 0.0,
+   "mean_p_pos": 0.919,
+   "mean_p_neg": 0.095
+  }
+ }
+}

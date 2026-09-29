@@ -1,0 +1,214 @@
+{
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.014,
+    "mean_conf": 0.97
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.056,
+    "mean_conf": 0.972
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.069,
+    "mean_conf": 0.957
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.875,
+    "ece": 0.1,
+    "mean_conf": 0.953
+   },
+   "50": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.875,
+    "ece": 0.075,
+    "mean_conf": 0.932
+   }
+  }
+ },
+ "label_language": {
+  "ja_labels": 0.917,
+  "en_labels": 0.917
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.05,
+   "mean_conf": 0.95,
+   "mean_p_aggr_on_aggr": 0.914,
+   "mean_p_aggr_on_benign": 0.014
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.036,
+   "mean_conf": 0.965,
+   "mean_p_aggr_on_aggr": 0.964,
+   "mean_p_aggr_on_benign": 0.035
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.043,
+   "mean_conf": 0.957,
+   "mean_p_aggr_on_aggr": 0.928,
+   "mean_p_aggr_on_benign": 0.015
+  }
+ },
+ "score": {
+  "pearson_r": 0.99,
+  "mae": 0.127,
+  "argmax_level_counts(gold=2 each)": [
+   2,
+   2,
+   2,
+   1,
+   3
+  ],
+  "scores": [
+   0.0,
+   0.0,
+   0.96,
+   0.87,
+   2.0,
+   2.01,
+   3.41,
+   3.67,
+   3.99,
+   4.0
+  ]
+ },
+ "context": {
+  "laya-multilingual-mlx": {
+   "300/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.045,
+    "mean_conf": 0.96,
+    "input_tokens": 501
+   },
+   "300/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.075,
+    "mean_conf": 0.961,
+    "input_tokens": 501
+   },
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.037,
+    "mean_conf": 0.964,
+    "input_tokens": 861
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.056,
+    "mean_conf": 0.953,
+    "input_tokens": 861
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.041,
+    "mean_conf": 0.96,
+    "input_tokens": 1221
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.037,
+    "mean_conf": 0.953,
+    "input_tokens": 1221
+   },
+   "2000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.041,
+    "mean_conf": 0.965,
+    "input_tokens": 2301
+   },
+   "2000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.054,
+    "mean_conf": 0.949,
+    "input_tokens": 2301
+   },
+   "4000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.035,
+    "mean_conf": 0.957,
+    "input_tokens": 4281
+   },
+   "4000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.064,
+    "mean_conf": 0.949,
+    "input_tokens": 4281
+   },
+   "6000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.012,
+    "mean_conf": 0.988,
+    "input_tokens": 6262
+   },
+   "6000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.021,
+    "mean_conf": 0.979,
+    "input_tokens": 6262
+   },
+   "8000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.014,
+    "mean_conf": 0.986,
+    "input_tokens": 8242
+   },
+   "8000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.022,
+    "mean_conf": 0.978,
+    "input_tokens": 8242
+   }
+  },
+  "tokens_per_filler": 179.9
+ }
+}

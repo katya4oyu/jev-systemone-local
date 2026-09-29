@@ -1,0 +1,75 @@
+{
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.875,
+    "ece": 0.18,
+    "mean_conf": 0.695
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.833,
+    "ece": 0.223,
+    "mean_conf": 0.7
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.792,
+    "ece": 0.188,
+    "mean_conf": 0.605
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.708,
+    "ece": 0.214,
+    "mean_conf": 0.494
+   },
+   "50": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.208,
+    "ece": 0.15,
+    "mean_conf": 0.359
+   }
+  }
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.95,
+   "ece": 0.053,
+   "mean_conf": 0.95,
+   "mean_p_aggr_on_aggr": 0.862,
+   "mean_p_aggr_on_benign": 0.048
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.25,
+   "ece": 0.771,
+   "mean_conf": 0.877,
+   "mean_p_aggr_on_aggr": 0.19,
+   "mean_p_aggr_on_benign": 0.79
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.9,
+   "ece": 0.111,
+   "mean_conf": 0.929,
+   "mean_p_aggr_on_aggr": 0.802,
+   "mean_p_aggr_on_benign": 0.024
+  }
+ },
+ "latency_single_ms": {
+  "p50": 10.8,
+  "p95": 11.3,
+  "note": "PyTorch on MPS in-process, not the MLX server"
+ }
+}

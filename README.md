@@ -82,6 +82,8 @@ state全体が質問の接頭辞とともに収まらないときは黙って切
 
 ## 参考実装・資料
 
+- [`docs/research/jev-vs-laya-case-studies.md`](docs/research/jev-vs-laya-case-studies.md) — JevとLayaのケーススタディ調査と、日本語のローカル実測(`eval/ja/`)。
+
 ### Jev互換サーバ
 
 - [`laya-serve`](https://pypi.org/project/laya-serve/) — Layaの重みをローカルで読み込み、`POST /v1/systemone`、`GET /v1/models`、`GET /healthz` を提供する先行実装。エンドポイント構成、モデル名の扱い、入力検証、エラー応答、preloadやAPIキーなどのサーバ運用面を参考にする。
