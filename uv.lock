@@ -291,6 +291,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "laya-coreml" },
     { name = "laya-mlx" },
     { name = "uvicorn" },
@@ -298,7 +299,6 @@ dependencies = [
 
 [package.optional-dependencies]
 test = [
-    { name = "httpx" },
     { name = "pytest" },
     { name = "typesafe-sdk" },
 ]
@@ -306,7 +306,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1" },
-    { name = "httpx", marker = "extra == 'test'", specifier = ">=0.27,<1" },
+    { name = "httpx", specifier = ">=0.27,<1" },
     { name = "laya-coreml", specifier = "==0.1.0" },
     { name = "laya-mlx", specifier = ">=0.2,<0.3" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8,<10" },
@@ -351,7 +351,7 @@ name = "mlx"
 version = "0.32.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "mlx-metal" },
+    { name = "mlx-metal", marker = "sys_platform == 'darwin'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4e/3c/f56f5de7188b0b5855046244b1ebb6f2055cc298c9f7336b69cc2013ad23/mlx-0.32.2-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:238b50d2ee3917c836e73f9446011518b79ff094940eb0107fa6cd17d02a2eca", size = 625943, upload-time = "2026-08-25T10:31:33.737Z" },
