@@ -88,7 +88,7 @@ def build_labels(n, gold, rng):
 
 def run_latency(c, out):
     res = {}
-    for m in (MLX, COREML, ANE):
+    for m in ((MLX,) if MODEL_OVERRIDE else (MLX, COREML, ANE)):
         one = {"q": {"type": "noul", "instructions": "この文は苦情ですか？"}}
         five = {f"q{i}": {"type": "noul", "instructions": f"質問{i}: この文は苦情ですか？"} for i in range(5)}
         for _ in range(5):

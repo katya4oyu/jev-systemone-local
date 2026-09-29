@@ -1,0 +1,227 @@
+{
+ "latency": {
+  "laya-multilingual-mlx": {
+   "single": {
+    "p50_ms": 27.4,
+    "p95_ms": 29.0
+   },
+   "batch5": {
+    "p50_ms": 140.5,
+    "p95_ms": 154.4
+   }
+  }
+ },
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.03,
+    "mean_conf": 0.97
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.074,
+    "mean_conf": 0.936
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.067,
+    "mean_conf": 0.951
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.066,
+    "mean_conf": 0.934
+   },
+   "50": {
+    "n": 0,
+    "errors": 24,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "last_error": "422 {\"detail\":\"Question 'q' has 50 options, but this model handles at most 26. Shortlist the options first, or split the que"
+   }
+  }
+ },
+ "label_language": {
+  "ja_labels": 0.958,
+  "en_labels": 0.917
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.85,
+   "ece": 0.094,
+   "mean_conf": 0.854,
+   "mean_p_aggr_on_aggr": 0.588,
+   "mean_p_aggr_on_benign": 0.012
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.75,
+   "ece": 0.107,
+   "mean_conf": 0.645,
+   "mean_p_aggr_on_aggr": 0.66,
+   "mean_p_aggr_on_benign": 0.484
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 0.9,
+   "ece": 0.095,
+   "mean_conf": 0.868,
+   "mean_p_aggr_on_aggr": 0.726,
+   "mean_p_aggr_on_benign": 0.011
+  }
+ },
+ "score": {
+  "pearson_r": 0.875,
+  "mae": 0.64,
+  "argmax_level_counts(gold=2 each)": [
+   4,
+   0,
+   2,
+   0,
+   4
+  ],
+  "scores": [
+   0.5,
+   1.89,
+   0.58,
+   0.55,
+   2.49,
+   2.84,
+   3.67,
+   3.7,
+   3.66,
+   3.89
+  ]
+ },
+ "context": {
+  "laya-multilingual-mlx": {
+   "300/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.061,
+    "mean_conf": 0.939,
+    "input_tokens": 178
+   },
+   "300/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.061,
+    "mean_conf": 0.939,
+    "input_tokens": 178
+   },
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.113,
+    "mean_conf": 0.887,
+    "input_tokens": 582
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.083,
+    "mean_conf": 0.886,
+    "input_tokens": 582
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.094,
+    "mean_conf": 0.89,
+    "input_tokens": 885
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.09,
+    "mean_conf": 0.88,
+    "input_tokens": 885
+   },
+   "2000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.102,
+    "mean_conf": 0.886,
+    "input_tokens": 1895
+   },
+   "2000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.102,
+    "mean_conf": 0.881,
+    "input_tokens": 1895
+   },
+   "4000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.102,
+    "mean_conf": 0.887,
+    "input_tokens": 3915
+   },
+   "4000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.087,
+    "mean_conf": 0.872,
+    "input_tokens": 3915
+   },
+   "6000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.106,
+    "mean_conf": 0.872,
+    "input_tokens": 5936
+   },
+   "6000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.101,
+    "mean_conf": 0.919,
+    "input_tokens": 5936
+   },
+   "8000/message_last": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.099,
+    "mean_conf": 0.868,
+    "input_tokens": 7956
+   },
+   "8000/message_first": {
+    "n": 12,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.105,
+    "mean_conf": 0.913,
+    "input_tokens": 7956
+   }
+  },
+  "tokens_per_filler": 100.9
+ }
+}

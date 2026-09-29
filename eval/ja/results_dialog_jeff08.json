@@ -1,0 +1,120 @@
+{
+ "end_of_utterance": {
+  "noul": {
+   "n": 60,
+   "acc@0.5": 0.567,
+   "auc": 0.616,
+   "best_thr_acc": [
+    0.633,
+    0.4
+   ],
+   "fpr_at_recall90": 0.867,
+   "mean_p_pos": 0.42,
+   "mean_p_neg": 0.362
+  },
+  "choice2": {
+   "n": 60,
+   "acc@0.5": 0.517,
+   "auc": 0.726,
+   "best_thr_acc": [
+    0.733,
+    0.8
+   ],
+   "fpr_at_recall90": 0.667,
+   "mean_p_pos": 0.773,
+   "mean_p_neg": 0.657
+  }
+ },
+ "eou_truncation": {
+  "noul": {
+   "n": 44,
+   "acc@0.5": 0.432,
+   "auc": 0.655,
+   "best_thr_acc": [
+    0.682,
+    0.1
+   ],
+   "fpr_at_recall90": 0.929,
+   "mean_p_pos": 0.42,
+   "mean_p_neg": 0.356
+  },
+  "choice2": {
+   "n": 44,
+   "acc@0.5": 0.659,
+   "auc": 0.638,
+   "best_thr_acc": [
+    0.682,
+    0.3
+   ],
+   "fpr_at_recall90": 0.857,
+   "mean_p_pos": 0.773,
+   "mean_p_neg": 0.724
+  }
+ },
+ "react_choice": {
+  "n": 45,
+  "errors": 0,
+  "acc": 0.356,
+  "ece": 0.329,
+  "mean_conf": 0.657,
+  "confusion": {
+   "応答->応答": 2,
+   "応答->無反応": 13,
+   "無反応->応答": 1,
+   "無反応->無反応": 14,
+   "相槌->無反応": 15
+  }
+ },
+ "memory_worthy": {
+  "noul": {
+   "n": 40,
+   "acc@0.5": 0.65,
+   "auc": 0.932,
+   "best_thr_acc": [
+    0.875,
+    0.1
+   ],
+   "fpr_at_recall90": 0.2,
+   "mean_p_pos": 0.402,
+   "mean_p_neg": 0.051
+  },
+  "choice2": {
+   "n": 40,
+   "acc@0.5": 0.65,
+   "auc": 0.943,
+   "best_thr_acc": [
+    0.875,
+    0.05
+   ],
+   "fpr_at_recall90": 0.15,
+   "mean_p_pos": 0.355,
+   "mean_p_neg": 0.026
+  }
+ },
+ "topic_drift": {
+  "noul": {
+   "n": 40,
+   "acc@0.5": 0.65,
+   "auc": 0.885,
+   "best_thr_acc": [
+    0.8,
+    0.2
+   ],
+   "fpr_at_recall90": 0.3,
+   "mean_p_pos": 0.378,
+   "mean_p_neg": 0.134
+  },
+  "choice2": {
+   "n": 40,
+   "acc@0.5": 0.6,
+   "auc": 0.905,
+   "best_thr_acc": [
+    0.85,
+    0.3
+   ],
+   "fpr_at_recall90": 0.25,
+   "mean_p_pos": 0.433,
+   "mean_p_neg": 0.144
+  }
+ }
+}

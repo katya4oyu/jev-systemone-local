@@ -1,0 +1,37 @@
+{
+ "noul_full": {
+  "auc": 0.918,
+  "acc@0.5": 0.825,
+  "best_thr_acc": 0.831,
+  "mean_p_pos": 0.631,
+  "mean_p_neg": 0.195
+ },
+ "noul_short": {
+  "auc": 1.0,
+  "acc@0.5": 0.963,
+  "best_thr_acc": 0.994,
+  "mean_p_pos": 0.954,
+  "mean_p_neg": 0.284
+ },
+ "choice_pair": {
+  "auc": 0.673,
+  "acc@0.5": 0.725,
+  "best_thr_acc": 0.725,
+  "mean_p_pos": 0.676,
+  "mean_p_neg": 0.497
+ },
+ "choice_pair_ctx": {
+  "auc": 0.925,
+  "acc@0.5": 0.75,
+  "best_thr_acc": 0.844,
+  "mean_p_pos": 0.83,
+  "mean_p_neg": 0.449
+ },
+ "score_relatedness": {
+  "auc": 0.7,
+  "acc@0.5": 0.675,
+  "best_thr_acc": 0.7,
+  "mean_p_pos": 0.775,
+  "mean_p_neg": 0.611
+ }
+}
