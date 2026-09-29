@@ -59,7 +59,7 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 - `GET /`：公式JavaScript SDK経由で動く判断デモ。入力文と質問JSONを編集できる。
 - `GET /vendor/typesafe-sdk.mjs`：同一サーバから配信する公式SDK v0.6.0のESM配布物（MITライセンスは `src/jev_systemone_local/vendor/LICENSE.typesafe-sdk`）。
 - `POST /v1/systemone`：TypeSafeの`state`、`model`、`questions`形式。`choice`、`score`、`noul`を扱う。
-- `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。ほかに`laya-multilingual-coreml`と`laya-multilingual-coreml-ane`を公開する。
+- `GET /v1/models`：公式SDKで読めるモデル一覧。`jev-latest`は互換エイリアスであり、実体は`laya-multilingual-mlx`。ほかに`laya-multilingual-coreml`と`laya-multilingual-coreml-ane`を公開する。設定すれば、微調整したモデルと、Jeff・Kevなど別サーバへの転送も並ぶ（下記）。
 - `GET /healthz`：モデルの読み込みが完了してから`ready`を返す。
 - `GET /docs`：FastAPIの対話的なAPI仕様。
 
@@ -68,6 +68,57 @@ iPhoneも同じtailnetへ接続し、`http://<MacのTailscale IPv4>:8017/` をSa
 MLXのモデルは最大8,192トークン、汎用Core MLは最大1,024トークン、Neural Engine用の`laya-multilingual-coreml-ane`は最大96トークン。上限にはstateだけでなく質問、選択肢、特殊トークンも含む。MLXは既存の重みを使い、実行時の`max_len`だけを拡張する。短文を上限まで埋めて計算することはないが、実際の入力が長くなると推論時間とメモリ使用量は増える。多言語モデルの学習時の長さは1,024トークンであり、8,192トークン全域での判断精度を保証するものではない（[本家の長文対応と検証結果](https://github.com/NandhaKishorM/laya/blob/23a17522aa4942da6cce53a995a275760320b691/README.md)）。
 
 state全体が質問の接頭辞とともに収まらないときは黙って切り詰めず422を返す。モデル間の暗黙の切り替えはしない。ただし、Laya内部の質問文や選択肢の圧縮まで防ぐものではない。Jev本体とは重み、精度、速度、コンテキスト長、確率の校正が異なる。互換性はこのAPIの形と公式SDKからの基本的な疎通を指し、Jevと同じ判断結果を意味しない。
+
+## モデルのおすすめAPI（Jevにない拡張）
+
+やりたいことを文章で送ると、どのモデルを使えばよいかを返す。Jevにも互換仕様にもない、このサーバ独自のAPIで、`/v1/systemone`とは別に動く。Jeff、Kev、Jev本体のように、このサーバでは提供していないモデルも候補に含め、起動方法も返す。
+
+```bash
+curl -s localhost:8017/v1/recommend -H 'content-type: application/json' -d '{
+  "text": "配信中のAIキャラが、コメント全部に反応しすぎる。返事すべきかをリアルタイムで判定したい。データは外に出したくない"
+}'
+```
+
+- `POST /v1/recommend`：`text`（必須、4,000文字まで）に、任意で`task`（用途を指定すると判定を省く）、`constraints`（`local_only`、`low_latency`、`long_text`、`negation`、`many_labels`。文章から読み取った値を上書きする）、`available_only`（このサーバで今使えるモデルだけに絞る）、`limit`（1〜7、既定3）を渡す。応答は、判定した用途と確信度、読み取った制約とその出どころ、順位づけした推薦（スコア、理由、警告、補足、使い方）、除外したモデルとその理由。
+- `GET /v1/recommend/catalog`：用途の一覧と、モデルごとの実測値（遅延、選択肢の上限、否定形・長文の精度、用途別の適合度）。
+
+用途は10種類（ターン制御、記憶判定、話題逸脱の検知、少数分類、多数分類、有害・スパム検知、段階評価、時系列の状態判定、文書間の関連判定、その他）。「その他」は生成・要約・推論のような選択肢から選ぶ判断ではない依頼で、モデルは推薦せず、生成モデルを使うよう返す。ローカル限定なら本文を外部へ送るJev本体を除外し、選択肢が上限を超えるならJeffを除外する。
+
+用途の判定は、日本語の依頼文で学習した小さな文字n-gram分類器（`intent_model.json`、約280KB、純Pythonで0.1ms未満）で行い、判断モデルは呼ばない。ゼロショットのLayaに同じ判定をさせたところ57%程度にしか届かなかったため、この形にした。未使用の評価データ120件での用途の正答率は約90%（確信度0.5以上に限ると98%）。制約の読み取りは取りこぼしがあり、特に否定形と低遅延は見逃しやすいので、重要な条件は`constraints`で明示する。順位づけに使う数値は、日本語の自作データ・少数サンプル・1台のMacでの実測で、目安として使う（[調査メモ](docs/research/jev-vs-laya-case-studies.md)の第10節）。
+
+## Jeff・Kevなど別のJev互換サーバをつなぐ
+
+別のプロセスで動かしているJev互換サーバ（[Jeff](https://github.com/firelex/jeff)、[Kev](https://github.com/jaredpalmer/kev)など）を、環境変数 `JEV_LOCAL_PROXY_MODELS` で登録すると、リクエストの`model`名でこのサーバから使える。書式は `名前=URL[|上流のモデル名]` をカンマ区切りにしたもの。
+
+```bash
+# 別のターミナルでそれぞれ起動しておく
+python -m kev.serve --run jaredpalmer/kev-4b --port 8009                       # Kev（jaredpalmer/kev）
+JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeffのチェックポイント> PORT=8765 jeff-serve  # Jeff（firelex/jeff）
+
+JEV_LOCAL_PROXY_MODELS="kev-4b=http://127.0.0.1:8009,jeff-2b=http://127.0.0.1:8765" uv run jev-systemone-local
+```
+
+上流のモデル名を省くと、名前の先頭部分から `kev-latest`、`jeff-latest` を使う（それ以外は `jev-latest`）。名前は `/v1/recommend` のカタログと同じ `kev-4b`、`kev-0.8b`、`jeff-2b`、`jeff-0.8b` にすると、おすすめAPIが利用可能なモデルとして扱い、`available_only`でも残る。
+
+このサーバは`/v1/systemone`を上流へ転送し、応答の`model`を登録名に置き換えるだけで、重みも推論も上流のもの。確率は直接呼んだときと一致し、転送による遅延の増加は約1msだった。`/v1/models`には`backend: proxy`と上流のホスト・モデル名（`proxy:127.0.0.1:8009/kev-latest`）を出す。上流が止まっている、または遅いときは、別のモデルへ黙って切り替えず、接続できなければ502、混雑・時間切れなら503を返す。上流がリクエストを拒否したとき（Jeffの選択肢26個の上限など）は、その内容を422で返す。起動時に上流が応答しなくても起動は失敗せず、警告だけを出す（後から起動してよい）。Snakeデモには使わない。転送先はこの環境変数で設定した運用者の指定先だけで、リクエストからは指定できない。
+
+## 微調整したモデルを載せる
+
+Layaを自前データで微調整したチェックポイントは、環境変数 `JEV_LOCAL_MLX_MODELS` で追加のモデルとして公開できる。書式は `名前=チェックポイント` をカンマ区切りにしたもので、チェックポイントはローカルのディレクトリかHugging Faceのid。
+
+```bash
+# 1. 微調整（eval/finetune/、PyTorchが必要）→ 出力ディレクトリ ft_out
+# 2. MLX形式へ変換（既存の出力先には書き込まない）
+uv run laya-mlx convert --model ft_out --output ~/models/laya-ja-turn-mlx
+# 3. 追加モデルとして起動
+JEV_LOCAL_MLX_MODELS="laya-ja-turn-mlx=$HOME/models/laya-ja-turn-mlx" uv run jev-systemone-local
+```
+
+リクエストの`model`に `laya-ja-turn-mlx` を指定すると、そのモデルで判定する。`/v1/models`にも並び、`jev-latest`は従来どおり`laya-multilingual-mlx`のまま変わらない。名前が既存のモデルや`jev-latest`と重なる場合、書式が不正な場合、チェックポイントを読み込めない場合は、無視せず起動に失敗する。ローカルの絶対パスは`/v1/models`に出さず`local:<ディレクトリ名>`と表示する。Snakeデモには追加モデルを使わない。
+
+追加モデルは学習時の長さ（微調整の既定では1,024トークン）のままで動かし、内蔵の多言語モデルのように8,192トークンへ拡張しない。学習していない長さの精度は保証できないため。同梱の評価では、`laya-ja-turn-mlx`（日本語の会話ターン処理向けに微調整）を`model`に指定して、PyTorchで測った結果と同じ精度と、単発約7.5msの遅延を確認している（[調査メモ](docs/research/jev-vs-laya-case-studies.md)の第8節）。重みはこのリポジトリに含めない。
+
+`laya-mlx`は校正温度を0.5〜5に切り詰めるため、微調整で得た温度がこの範囲を超えると、その分だけ確率の校正がずれる（警告が出る）。微調整したモデルは、学習した言い回しの質問（肯定形）だけで使う。否定形や反転した質問への頑健さは学習されていない。
 
 ## 動作確認
 
