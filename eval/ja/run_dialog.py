@@ -47,8 +47,8 @@ def two_forms(question, yes_desc, no_desc, yes="はい", no="いいえ"):
     return {"noul": noul_form, "choice2": choice_form}
 
 
-def main():
-    c = Client("http://127.0.0.1:8017")
+def main(c=None):
+    c = c or Client("http://127.0.0.1:8017")
     out = {}
 
     eou = [(t, ok) for t, ok in EOU_ITEMS]

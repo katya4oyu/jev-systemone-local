@@ -12,8 +12,8 @@ def choice(question, yes, no, yes_d, no_d):
 def noul(question):
     return lambda: ({"type": "noul", "instructions": question}, lambda a: a["noul"])
 
-def main():
-    c = Client("http://127.0.0.1:8017")
+def main(c=None):
+    c = c or Client("http://127.0.0.1:8017")
     out = {}
     eou = list(EOU_ITEMS)
     W = {
