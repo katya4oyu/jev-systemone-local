@@ -60,7 +60,7 @@ CATALOG: tuple[Profile, ...] = (
          "moderation": 0.9, "rating": None, "timeseries": None, "relevance": None},
         ("会話ターン処理向けに微調整済み。学習した言い回し（肯定形）の質問だけで使う", "学習時の長さ1,024トークンまで",
          "多ラベル分類は微調整前より劣化（20ラベルで0.79→0.71）"),
-        "JEV_LOCAL_MLX_MODELS に登録して model に指定（README「微調整したモデルを載せる」）"),
+        "SYSTEMONE_MLX_MODELS に登録して model に指定（README「微調整したモデルを載せる」）"),
     Profile(
         "laya-multilingual-mlx", "Laya multilingual（微調整なし）", "local", 7.2, True, None, 0.35, 0.5,
         {"turn_taking": 0.3, "memory": 0.58, "topic_shift": 0.69, "classify": 0.81, "classify_many": 0.33,
@@ -72,25 +72,25 @@ CATALOG: tuple[Profile, ...] = (
         {"turn_taking": 0.72, "memory": 0.99, "topic_shift": 1.0, "classify": 1.0, "classify_many": 1.0,
          "moderation": 1.0, "rating": 0.98, "timeseries": 0.98, "relevance": 0.93},
         ("ローカルの汎用判断で最もJevに近い", "Mac(MLX)で単発47ms・5問149ms。要32GBクラスのメモリ"),
-        "別プロセスで uv run --extra serve python -m kev.serve --run jaredpalmer/kev-4b --port 8009（jaredpalmer/kev）を起動し、JEV_LOCAL_PROXY_MODELS=kev-4b=http://127.0.0.1:8009 で登録"),
+        "別プロセスで uv run --extra serve python -m kev.serve --run jaredpalmer/kev-4b --port 8009（jaredpalmer/kev）を起動し、SYSTEMONE_PROXY_MODELS=kev-4b=http://127.0.0.1:8009 で登録"),
     Profile(
         "kev-0.8b", "Kev 0.8B", "external", 11, True, None, 0.75, 0.92,
         {"turn_taking": 0.55, "memory": 0.8, "topic_shift": 0.96, "classify": 0.96, "classify_many": 0.75,
          "moderation": 0.9, "rating": 0.71, "timeseries": 0.8, "relevance": 0.82},
         ("小型で速い（単発11ms）が、score型と時系列は弱め",),
-        "別プロセスで python -m kev.serve --run jaredpalmer/kev-0.8b --port 8009 を起動し、JEV_LOCAL_PROXY_MODELS=kev-0.8b=http://127.0.0.1:8009 で登録"),
+        "別プロセスで python -m kev.serve --run jaredpalmer/kev-0.8b --port 8009 を起動し、SYSTEMONE_PROXY_MODELS=kev-0.8b=http://127.0.0.1:8009 で登録"),
     Profile(
         "jeff-2b", "Jeff 2B", "external", 62, True, 26, 0.7, 1.0,
         {"turn_taking": 0.58, "memory": 0.96, "topic_shift": 0.96, "classify": 0.96, "classify_many": 0.0,
          "moderation": 0.85, "rating": 0.96, "timeseries": 0.95, "relevance": 0.9},
         ("選択肢は最大26個", "READMEは英語のみだが日本語でも実用的だった"),
-        "別プロセスで JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeff-Qwen3.5-2B> PORT=8765 jeff-serve（firelex/jeff、uv 0.12.19以上）を起動し、JEV_LOCAL_PROXY_MODELS=jeff-2b=http://127.0.0.1:8765 で登録"),
+        "別プロセスで JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeff-Qwen3.5-2B> PORT=8765 jeff-serve（firelex/jeff、uv 0.12.19以上）を起動し、SYSTEMONE_PROXY_MODELS=jeff-2b=http://127.0.0.1:8765 で登録"),
     Profile(
         "jeff-0.8b", "Jeff 0.8B", "external", 27, True, 26, 0.75, 0.92,
         {"turn_taking": 0.48, "memory": 0.93, "topic_shift": 0.9, "classify": 0.96, "classify_many": 0.0,
          "moderation": 0.85, "rating": 0.88, "timeseries": 0.75, "relevance": 0.88},
         ("選択肢は最大26個", "小型で速く、少数分類・関連判定は実用的"),
-        "別プロセスで JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeff-Qwen3.5-0.8B> PORT=8765 jeff-serve を起動し、JEV_LOCAL_PROXY_MODELS=jeff-0.8b=http://127.0.0.1:8765 で登録"),
+        "別プロセスで JEFF_BACKEND=mlx JEFF_CHECKPOINT=<Jeff-Qwen3.5-0.8B> PORT=8765 jeff-serve を起動し、SYSTEMONE_PROXY_MODELS=jeff-0.8b=http://127.0.0.1:8765 で登録"),
     Profile(
         "jev", "Jev（ホスト型API）", "external", 240, False, None, 1.0, 1.0,
         {"turn_taking": 0.85, "memory": 1.0, "topic_shift": 1.0, "classify": 0.92, "classify_many": 0.88,

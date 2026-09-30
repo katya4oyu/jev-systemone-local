@@ -5,9 +5,9 @@ import pytest
 from fastapi.testclient import TestClient
 from laya_mlx.agent import Agent
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.extra_models import load_extra_backends, parse_spec
-from jev_systemone_local.laya_mlx_backend import LayaMLXBackend
+from systemone_workbench.app import create_app
+from systemone_workbench.extra_models import load_extra_backends, parse_spec
+from systemone_workbench.laya_mlx_backend import LayaMLXBackend
 from test_app import FakeBackend, request
 from test_mlx_backend import Tokens
 
@@ -74,3 +74,19 @@ def test_request_model_selects_the_extra_backend():
         assert client.post("/v1/systemone", json=request(model="jev-latest")).json()["model"] == "laya-multilingual-mlx"
         names = [m["name"] for m in client.get("/v1/models").json()["models"]]
         assert "laya-ja-turn-mlx" in names
+
+
+def test_former_env_names_are_still_read_and_conflicts_are_rejected(monkeypatch):
+    from systemone_workbench.extra_models import LEGACY_ENV_VAR, LEGACY_PROXY_ENV_VAR, read_env
+
+    monkeypatch.delenv("SYSTEMONE_MLX_MODELS", raising=False)
+    monkeypatch.delenv("SYSTEMONE_PROXY_MODELS", raising=False)
+    monkeypatch.setenv(LEGACY_ENV_VAR, "ja=/m/ja")
+    monkeypatch.setenv(LEGACY_PROXY_ENV_VAR, "kev-4b=http://127.0.0.1:8009")
+    assert read_env("SYSTEMONE_MLX_MODELS", LEGACY_ENV_VAR) == "ja=/m/ja"
+    assert list(load_extra_backends(set(), lambda c, **kw: c)) == ["ja"]  # falls back to the former name
+    monkeypatch.setenv("SYSTEMONE_MLX_MODELS", "ja=/m/ja")  # same value under both names is fine
+    assert read_env("SYSTEMONE_MLX_MODELS", LEGACY_ENV_VAR) == "ja=/m/ja"
+    monkeypatch.setenv("SYSTEMONE_MLX_MODELS", "en=/m/en")
+    with pytest.raises(ValueError, match="both set"):
+        read_env("SYSTEMONE_MLX_MODELS", LEGACY_ENV_VAR)

@@ -1,4 +1,4 @@
-"""Train the /v1/recommend task classifier and export it as src/jev_systemone_local/intent_model.json.
+"""Train the /v1/recommend task classifier and export it as src/systemone_workbench/intent_model.json.
 
 Needs scikit-learn (training only; the served classifier is pure Python):
     uv run --with scikit-learn python eval/recommend/train_classifier.py
@@ -23,7 +23,7 @@ root = here.parent.parent
 sys.path[:0] = [str(here), str(root / "src")]
 from requests_ja import REQUESTS  # noqa: E402
 
-from jev_systemone_local.intent_classifier import IntentClassifier  # noqa: E402
+from systemone_workbench.intent_classifier import IntentClassifier  # noqa: E402
 
 
 def load(name):
@@ -74,7 +74,7 @@ for k in (1500, 3000, 6000, len(names)):
     print(f"K={k:6d}  dev {accuracy(model, dev):.3f}  test {accuracy(model, test):.3f}  all {accuracy(model, REQUESTS):.3f}")
 
 K = 3000
-out = root / "src/jev_systemone_local/intent_model.json"
+out = root / "src/systemone_workbench/intent_model.json"
 vocab = sorted(names[order[:K]])
 v2, l2 = fit(vocab)
 payload = export(v2, l2)

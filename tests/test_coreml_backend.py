@@ -1,7 +1,7 @@
 import pytest
 
-from jev_systemone_local.laya_coreml_backend import LayaCoreMLBackend
-from jev_systemone_local.laya_mlx_backend import InputTooLong
+from systemone_workbench.laya_coreml_backend import LayaCoreMLBackend
+from systemone_workbench.laya_mlx_backend import InputTooLong
 
 
 class Tokens:

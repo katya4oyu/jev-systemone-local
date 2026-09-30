@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from jev_systemone_local.app import create_app
-from jev_systemone_local.laya_mlx_backend import InputTooLong
+from systemone_workbench.app import create_app
+from systemone_workbench.laya_mlx_backend import InputTooLong
 
 
 class FakeBackend:

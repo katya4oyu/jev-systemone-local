@@ -286,36 +286,6 @@ wheels = [
 ]
 
 [[package]]
-name = "jev-systemone-local"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "laya-coreml" },
-    { name = "laya-mlx" },
-    { name = "uvicorn" },
-]
-
-[package.optional-dependencies]
-test = [
-    { name = "pytest" },
-    { name = "typesafe-sdk" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.115,<1" },
-    { name = "httpx", specifier = ">=0.27,<1" },
-    { name = "laya-coreml", specifier = "==0.1.0" },
-    { name = "laya-mlx", specifier = ">=0.2,<0.3" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8,<10" },
-    { name = "typesafe-sdk", marker = "extra == 'test'", specifier = ">=0.1,<2" },
-    { name = "uvicorn", specifier = ">=0.30,<1" },
-]
-provides-extras = ["test"]
-
-[[package]]
 name = "laya-coreml"
 version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -731,6 +701,36 @@ sdist = { url = "https://files.pythonhosted.org/packages/83/d3/803453b36afefb7c2
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a2/09/77d55d46fd61b4a135c444fc97158ef34a095e5681d0a6c10b75bf356191/sympy-1.14.0-py3-none-any.whl", hash = "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5", size = 6299353, upload-time = "2025-04-27T18:04:59.103Z" },
 ]
+
+[[package]]
+name = "systemone-workbench"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "laya-coreml" },
+    { name = "laya-mlx" },
+    { name = "uvicorn" },
+]
+
+[package.optional-dependencies]
+test = [
+    { name = "pytest" },
+    { name = "typesafe-sdk" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.115,<1" },
+    { name = "httpx", specifier = ">=0.27,<1" },
+    { name = "laya-coreml", specifier = "==0.1.0" },
+    { name = "laya-mlx", specifier = ">=0.2,<0.3" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8,<10" },
+    { name = "typesafe-sdk", marker = "extra == 'test'", specifier = ">=0.1,<2" },
+    { name = "uvicorn", specifier = ">=0.30,<1" },
+]
+provides-extras = ["test"]
 
 [[package]]
 name = "tenacity"
