@@ -77,4 +77,5 @@ git diff --check
 ## 最終状態（未完）
 
 - worktree/branch：`/Users/yuya/src/github.com/katya4oyu/systemone-workbench/.worktrees/clef-flash-4bit` / `eval/clef-flash-4bit`、base `241c55b07ffe2fc07137154779556f2e993104b4`。
-- suite result JSON、smoke、比較結果、final HEAD、local commit、server/watcher cleanup：**未完了**。repo testsは現時点で65 passed（1 deprecation warning）、最終treeでも再確認する。8021のport境界に関するMain判断後に評価を続ける。
+- 初期checkpoint commit：`4725f79806970d277e39e62b184f136cea52fc70`（reportとcomparison列）。このcommitのworktreeはclean。suite完了後の最終結果commitは未作成。
+- suite result JSON、smoke、比較結果、final HEAD、server/watcher cleanup：**未完了**。repo testsは現時点で65 passed（1 deprecation warning）、最終treeでも再確認する。8021のport境界に関するMain判断後に評価を続ける。
