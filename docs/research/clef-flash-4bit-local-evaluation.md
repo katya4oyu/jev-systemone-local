@@ -1,6 +1,6 @@
 # Clef-Flash MLX 4bit：日本語評価・実測レポート
 
-**進行中（2026-10-04 03:14 JST）**。固定revisionの4bit重み取得・metadata確認は完了し、worktreeのrepo testsは65 passed。評価suiteはまだ開始していない。5回のtask-owned server起動はすべてEADDRINUSEで終了（最初の4回はmodel load後、5回目はport予約bind時）。同一Python processからのIPv4/IPv6 loopback/wildcard bindも8021で失敗する一方、lsof/netstatにはsocket ownerが見えず、Clef/eval processもない。8022/8023/8031はdirect bind可能と確認。重複評価runは起動していない。Mainの指定portを独断で変えず、8021の予約境界を解消するか8022へ切り替える判断を待つ。
+**進行中（2026-10-04 03:17 JST）**。固定revisionの4bit重み取得・metadata確認は完了し、独立worktreeで `uv --no-config sync --extra test` exit 0、pytestは65 passed（1 deprecation warning）。評価suiteはまだ開始していない。通常server起動4回（PID 38336、42179、46348、46857）はmodel load後、5回目の予約bind launcher（PID 48134）はmodel load前に、いずれもEADDRINUSEで終了した。同一Python processからのIPv4/IPv6 loopback/wildcard bindも8021で失敗する一方、lsof/netstatにはsocket ownerが見えず、Clef/eval processもない。候補の8022/8023/8031はdirect bind可能と確認した。重複評価runは起動していない。Main指定portは承認なく変更せず、8021の予約境界を解消するか、availableなlocalhost portへ切り替える判断を待つ。
 
 ## モデルprovenance
 
@@ -30,8 +30,8 @@
 
 - append-only phase log：`/Users/yuya/.hermes/cache/scratch/clef_flash_4bit_eval.log`
 - 新規評価runnerはまだ起動していないため、重複runはない。
-- phase collectorは初回のlog file置換で停止（inode変更）。以後は専用append helperで同じinodeへ追記。collector PID 42043は再起動後readiness確認済みで、`PHASE_EXIT`通知のみ。今後logのtruncate/atomic replaceはしない。
-- server / watcherの所有PID、起動・終了phase、port消失は完了時に記録する。
+- phase collectorは初回のlog file置換で停止（inode変更）。以後は専用append helperで同じinode（130388536）へ追記。collector PID 42043はreadiness確認済み・`PHASE_EXIT`通知のみとし、evaluation未開始のため停止してexit -15を確認した。port判断後に再起動する。今後logのtruncate/atomic replaceはしない。
+- task-owned server起動試行はすべてexit済み。現在8021 listenerなし、評価processなし。port判断後に新しいserver/watcherを起動する。
 
 ## 比較と解釈上の注意
 
@@ -78,4 +78,4 @@ git diff --check
 
 - worktree/branch：`/Users/yuya/src/github.com/katya4oyu/systemone-workbench/.worktrees/clef-flash-4bit` / `eval/clef-flash-4bit`、base `241c55b07ffe2fc07137154779556f2e993104b4`。
 - 初期checkpoint commit：`4725f79806970d277e39e62b184f136cea52fc70`（reportとcomparison列）。このcommitのworktreeはclean。suite完了後の最終結果commitは未作成。
-- suite result JSON、smoke、比較結果、final HEAD、server/watcher cleanup：**未完了**。repo testsは現時点で65 passed（1 deprecation warning）、最終treeでも再確認する。8021のport境界に関するMain判断後に評価を続ける。
+- port blockerのstatus checkpointもローカルcommit済み。suite result JSON、smoke、比較結果、final HEAD、最終結果commit：**未完了**。repo testsは現時点で65 passed（1 deprecation warning）、最終treeでも再確認する。現在server/watcher/評価processは停止済み。8021のport境界に関するMain判断後に評価を続ける。
