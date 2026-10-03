@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 here = Path(__file__).parent
-MODELS = [("laya", ""), ("laya-ft", "ft"), ("jev", "jev"), ("jeff-0.8B", "jeff08"), ("jeff-2B", "jeff2b"), ("kev-0.8B", "kev08"), ("kev-4B", "kev4b")]
+MODELS = [("laya", ""), ("laya-ft", "ft"), ("jev", "jev"), ("jeff-0.8B", "jeff08"), ("jeff-2B", "jeff2b"), ("kev-0.8B", "kev08"), ("kev-4B", "kev4b"), ("clef-flash-8bit", "clefflash8")]
 
 
 def load(base, tag):
