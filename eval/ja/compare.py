@@ -1,12 +1,12 @@
 """Compile results_*_<tag>.json of all evaluated models into markdown tables (printed to stdout).
 
-Tags: laya (MLX base, no suffix), ft (fine-tuned laya), jev, jeff08, jeff2b, kev08, kev4b.
+Tags: laya (MLX base, no suffix), ft (fine-tuned laya), jev, jeff08, jeff2b, kev08, kev4b, clefflash8, clefflash4.
 """
 import json
 from pathlib import Path
 
 here = Path(__file__).parent
-MODELS = [("laya", ""), ("laya-ft", "ft"), ("jev", "jev"), ("jeff-0.8B", "jeff08"), ("jeff-2B", "jeff2b"), ("kev-0.8B", "kev08"), ("kev-4B", "kev4b"), ("clef-flash-8bit", "clefflash8")]
+MODELS = [("laya", ""), ("laya-ft", "ft"), ("jev", "jev"), ("jeff-0.8B", "jeff08"), ("jeff-2B", "jeff2b"), ("kev-0.8B", "kev08"), ("kev-4B", "kev4b"), ("clef-flash-8bit", "clefflash8"), ("clef-flash-4bit", "clefflash4")]
 
 
 def load(base, tag):
