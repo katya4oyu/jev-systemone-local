@@ -1,6 +1,6 @@
 # Clef-Flash MLX 4bit：日本語評価・実測レポート
 
-**進行中（2026-10-04 03:17 JST）**。固定revisionの4bit重み取得・metadata確認は完了し、独立worktreeで `uv --no-config sync --extra test` exit 0、pytestは65 passed（1 deprecation warning）。評価suiteはまだ開始していない。通常server起動4回（PID 38336、42179、46348、46857）はmodel load後、5回目の予約bind launcher（PID 48134）はmodel load前に、いずれもEADDRINUSEで終了した。同一Python processからのIPv4/IPv6 loopback/wildcard bindも8021で失敗する一方、lsof/netstatにはsocket ownerが見えず、Clef/eval processもない。候補の8022/8023/8031はdirect bind可能と確認した。重複評価runは起動していない。Main指定portは承認なく変更せず、8021の予約境界を解消するか、availableなlocalhost portへ切り替える判断を待つ。
+**実測・suite・比較・cleanup完了。** 固定4bit checkpointを専用worktreeからlocalhostで実推論し、既存日本語評価を全phase一巡した。8021のbind blockerは原因を追い続けず、許可された空きport `8022` へ切り替えて解消した。結果は以下のとおり。小規模・単回の評価であり、一般的な実用性能や統計的有意差を示すものではない。
 
 ## モデルprovenance
 
@@ -8,37 +8,62 @@
 - 固定revision：`140bf7e037f5fa95a96535feca112f46c15927cf`
 - Base：`Cloudflare/clef-flash`（公式revision `17f0b0ad64efb65d273590632833508766b2aae6`）
 - Snapshot：`/Users/yuya/.cache/huggingface/hub/models--mlx-community--clef-flash-4bit/snapshots/140bf7e037f5fa95a96535feca112f46c15927cf`
-- `config.json`：`bits=4`, `group_size=64`, `mode=affine`。backboneは9B。model shard 2個とjoint headの合計は実ファイルで `6,193,757,576 bytes`（約6.19 GB）。公式モデルカードの丸め表記は6.2 GB。
-- custom `clef_mlx.py` は8bit固定revisionの同名loaderとSHA-256 `852223c944819a32fad5cf798d9d1dff30419820eaf5ad1f10cb9698afec97d5` が一致。loaderはtext generationではなくjoint schema headを実行する。量子化差はconfig上の4bit/8bit設定。
+- `config.json`：`bits=4`, `group_size=64`, `mode=affine`。backboneは9B。model shard 2個とjoint headの合計は `6,193,757,576 bytes`（約6.19 GB）。
+- custom `clef_mlx.py` は8bit固定revisionのloaderとSHA-256 `852223c944819a32fad5cf798d9d1dff30419820eaf5ad1f10cb9698afec97d5` が一致。推論はjoint schema headを使用し、text generation APIは使っていない。
 
-## 実行環境
+## 実行環境・接続確認
 
 - Python 3.12.12、arm64 Apple Silicon、RAM `51,539,607,552 bytes`、MLX default device `Device(gpu, 0)`、Metal available。
-- 既存隔離環境 `/Users/yuya/.hermes/cache/scratch/clef-flash-8bit-venv` を再利用。mlx 0.32.3、mlx-lm 0.32.0、mlx-vlm 0.7.4、transformers 5.18.0、huggingface-hub 1.33.0、httpx 0.28.1、typesafe-sdk 0.7.2。環境は書き換えていない。
-- 8021番は通常server起動4回とモデルload前の予約bind 1回がEADDRINUSE。4回目は100.38秒観測してsocketなし。直接bind probeでもIPv4/IPv6のloopback/wildcardすべて失敗したが、lsof/netstatには該当socketがなく、実行中の所有processを特定できなかった。8022/8023/8031はbind可能。別processは停止していない。
+- 既存隔離環境 `/Users/yuya/.hermes/cache/scratch/clef-flash-8bit-venv` を再利用。mlx 0.32.3、mlx-lm 0.32.0、mlx-vlm 0.7.4、transformers 5.18.0、huggingface-hub 1.33.0、httpx 0.28.1、typesafe-sdk 0.7.2。環境の再install/変更はしていない。
+- REST `/health` と `/v1/models` は200、返されたmodel idは `clef-flash-4bit`。明示model名でのREST実推論は200、request/responseとも同名、choice/noul/scoreの3回答を返した（377 input tokens、server-reported 860.4 ms）。
+- 公式 `typesafe-sdk 0.7.2` の型付きclientでもstatus 200。request/response model名とanswer type 3種を確認した。
+- `--no-truncate`で起動。最大長はloader/HTTP sourceの `max_length=16384`。必須over-limit試験では175,142 tokens相当の入力がHTTP 413となり、拒否理由に最大16,384が含まれた。loaderは `truncate=False` 時にstateを切り詰めず `ContextTooLong` をraiseし、HTTP層が413へ変換する。**16,384ちょうどの実入力成功境界は試していない。** smoke集計：`/Users/yuya/.hermes/cache/scratch/clef_flash_4bit_smoke.json`。
+- 8021はEADDRINUSEだったため繰り返しbindせず、許可を得た `127.0.0.1:8022` へ切り替えた。他processの停止や8021の操作はしていない。
 
-## smoke・評価suite・比較の状態
+## 既存日本語suite：すべてexit 0
 
-- REST choice/noul/score実推論、`typesafe_sdk`型付き実推論、model名のrequest/response一致、`--no-truncate`の16,384上限超過413確認：**未実行**。8021のbind blocker解決後に実行する。
-- 既存suite（`run_all.sh`：core latency/choice/label-language/noul/score/context、timeseries、dialog、dialog wordings、wiki synth、private wiki、wiki variants）：**未開始**。
-- 採点修正確認の60件 `run_dialog_wording_polarity_check.py`：**未開始**。
-- 4bit / 8bit / historical Kev-4B比較：**未生成**。Kev-4Bは既存記録のみで再測定しない。
-- `compare.py`には `clef-flash-4bit` / `clefflash4`列を追加済み。4bit result JSONとsuite完了後に比較表を生成・確認する。
-- `uv --no-config sync --extra test` exit 0。独立worktreeのPython 3.13.15環境で `env -u PYTHONPATH -u PYTHONHOME uv --no-config run pytest -q` は **65 passed, 0 failed**、Starlette/anyioのDeprecationWarning 1件。最終treeで再確認する。
+`eval/ja/run_all.sh` を明示的な `EVAL_MODEL=clef-flash-4bit`, `EVAL_TAG=clefflash4`, `EVAL_BASE=http://127.0.0.1:8022` で実行した。core（6 task）はrun script exit 0、timeseries、dialog、dialog wordings、wiki synth、private wiki、wiki variantsも各exit 0。
 
-## phase log・task-owned resource
+| 指標 | Clef-Flash 4bit |
+|---|---:|
+| latency p50 / p95、単発（client計測） | 354.4 / 358.2 ms |
+| latency p50 / p95、5問batch（client計測） | 1,123.4 / 1,172.8 ms |
+| 問い合わせ5分類、2 / 5 / 10 / 20 / 50 labels（各n=24） | 0.958 / 0.917 / 0.917 / 0.875 / 0.792 |
+| label language accuracy、日本語 / 英語 | 0.917 / 0.917 |
+| noul accuracy、positive / negated / English（各n=20） | 0.950 / 1.000 / 1.000 |
+| score Pearson r / MAE（n=10） | 0.982 / 0.180 |
+| context、約8k tokens、本文が末尾 / 先頭（各n=12） | 0.917 / 0.917（実測input 8,018 tokens、errors 0） |
 
-- append-only phase log：`/Users/yuya/.hermes/cache/scratch/clef_flash_4bit_eval.log`
-- 新規評価runnerはまだ起動していないため、重複runはない。
-- phase collectorは初回のlog file置換で停止（inode変更）。以後は専用append helperで同じinode（130388536）へ追記。collector PID 42043はreadiness確認済み・`PHASE_EXIT`通知のみとし、evaluation未開始のため停止してexit -15を確認した。port判断後に再起動する。今後logのtruncate/atomic replaceはしない。
-- task-owned server起動試行はすべてexit済み。現在8021 listenerなし、評価processなし。port判断後に新しいserver/watcherを起動する。
+- **時系列**（各error 0）：trend raw len12/60 = 0.911/1.000、trend summary len12/60 = 1.000/1.000。spike raw len12/60 = 1.000/0.850、spike summary len12/60 = 1.000/0.833。next-up raw/summary = 0.556/0.433（各n=90）。
+- **会話**：EOU AUC（noul/choice）0.949/0.978（n=60）、memory 0.990/0.995（n=40）、topic drift 1.000/1.000（n=40）、応答/相槌/無反応accuracy 0.867（n=45）。
+- **wordings**：EOUの「話し終えた？」noul AUC/accuracy 0.722/0.550、「文が完結？」0.973/0.850、補正済み「まだ続きがありますか？」0.972/0.883、「言い終わり/言いかけ」choice 0.979/0.900、「完全な文/途切れた文」0.988/0.800。memoryの個人情報/保存すべきかnoulは0.968/0.812、topic-drift各条件AUCは1.000。意味が異なる問いを単なる言い換え耐性とは扱わない。
+- **合成wiki**（link/split/duplicate）：noul/choice AUCはlink 0.993/0.991、split 0.983/1.000、duplicate 1.000/1.000。
+- **私的wiki**（421 knowledge / 50 memos）：link AUC 0.990（n=298）、sense AUC 0.872（n=200）、knowledge種別accuracy 0.61（n=100、majority baseline 0.96）、memos種別accuracy 0.94（n=50、baseline 0.66）、errors 0。Frontmatterを機械goldとした小規模評価なので、特にknowledge種別はmajority baselineを下回る。
+- **wiki variants**（各形式160組）：AUC / accuracy@0.5 はnoul full 0.975/0.875、noul short 0.999/0.944、choice pair 0.998/0.850、choice+context 0.988/0.831、score relatedness 0.963/0.850。
+- 極性補正済みfocused check `run_dialog_wording_polarity_check.py` はexit 0：n=60、accuracy@0.5 0.883、AUC 0.972、mean probability 0.908（finished）/0.312（not finished）。既存 `noul_for_finished()` を用い、従来のraw評価極性誤りと混同しない別JSON `results_dialog_wordings_eou_continue_fixed_clefflash4.json` に保存した。
 
-## 比較と解釈上の注意
+## compare.py：4bit / 8bit / historical Kev-4B
 
-- `run_dialog_wordings.py`の「まだ続きがありますか？」raw値はgold極性との不一致で無効。8bit作業で追加済みの `noul_for_finished()` を用いて、60件のfocused再評価結果を比較する。
-- 会話項目は質問の意味が違う条件（例：個人情報判定と記憶すべきか）を単なる言い換え耐性とまとめない。
-- 既存Kev-4B値はhistorical baselineであり、今回のhardware・実行環境では再測定しない。
-- 自作の少数評価・私的wikiのFrontmatterを機械的goldに用いるため、結果はモデルの実用保証・統計的有意差ではない。wiki本文はlocalhost推論のみで扱い、本文やprivate snippetは保存せず集計JSONだけを残す。
+`eval/ja/compare.py` exit 0。出力表には `clef-flash-8bit` と `clef-flash-4bit` の両列が入り、Kev-4B列は既存記録から取得した。下表は同出力からの抜粋（精度/AUCはcompare.py表示の2桁丸め）。Kev-4Bはhistorical baselineで、今回再測定していない。
+
+| 指標 | Kev-4B既存値 | Clef-Flash 8bit | Clef-Flash 4bit |
+|---|---:|---:|---:|
+| 5分類、5 labels accuracy（n=24） | 1.00 | 0.96 | 0.92 |
+| 5分類、50 labels accuracy（n=24） | 1.00 | 0.83 | 0.79 |
+| positive / negated noul accuracy（各n=20） | 1.00 / 1.00 | 1.00 / 1.00 | 0.95 / 1.00 |
+| score Pearson r（n=10） | 0.98 | 0.98 | 0.98 |
+| context約8k、本文末尾 accuracy（n=12） | 1.00 | 0.92 | 0.92 |
+| EOU choice AUC（n=60） | 0.88 | 0.98 | 0.98 |
+| 実在wiki link AUC（n=298） | 0.95 | 0.99 | 0.99 |
+| latency p50、単発 / 5問batch | 47.00 / 149.00 ms | 353.90 / 1,231.50 ms | 354.40 / 1,123.40 ms |
+
+極性補正済みEOU focused 60件は4bit accuracy 0.883 / AUC 0.972、8bit accuracy 0.883 / AUC 0.987。単発遅延はこの測定でほぼ同じ、5問batch p50は4bitの方が短かった。数値は一回のローカル測定であり、環境差のある歴史的Kev値との性能保証や統計的有意差を意味しない。
+
+## 出力・プライバシー検査
+
+- 期待した評価JSON 8個（core、timeseries、dialog、wordings raw、wordings corrected、wiki synth、wiki、wiki variants）は8/8 JSON parse成功。
+- 37個のerror/error-count fieldはすべて0。privacy scanで `state`, `questions`, `body`, `snippet` 等のprivate payload key 0、512文字を超えるstring 0。wiki本文はlocalhost推論のみで扱い、保存したのは集計JSONだけ。
+- 評価結果JSON：`eval/ja/results_clefflash4.json`, `results_ts_clefflash4.json`, `results_dialog_clefflash4.json`, `results_dialog_wordings_clefflash4.json`, `results_dialog_wordings_eou_continue_fixed_clefflash4.json`, `results_wiki_synth_clefflash4.json`, `results_wiki_clefflash4.json`, `results_wiki_variants_clefflash4.json`。
 
 ## 再現手順
 
@@ -47,35 +72,27 @@ SNAPSHOT=/Users/yuya/.cache/huggingface/hub/models--mlx-community--clef-flash-4b
 env -u PYTHONPATH -u PYTHONHOME \
   /Users/yuya/.hermes/cache/scratch/clef-flash-8bit-venv/bin/python -I \
   "$SNAPSHOT/clef_mlx.py" serve --model "$SNAPSHOT" \
-  --name clef-flash-4bit --host 127.0.0.1 --port 8021 --no-truncate
+  --name clef-flash-4bit --host 127.0.0.1 --port 8022 --no-truncate
 ```
-
-別terminalで同じ既存suiteと修正極性のfocused確認を実行する（完了後に実際のexit code/metricsでこの欄を更新する）。
 
 ```bash
 cd /Users/yuya/src/github.com/katya4oyu/systemone-workbench/.worktrees/clef-flash-4bit
 env -u PYTHONPATH -u PYTHONHOME \
-  EVAL_BASE=http://127.0.0.1:8021 EVAL_MODEL=clef-flash-4bit EVAL_TAG=clefflash4 \
+  EVAL_BASE=http://127.0.0.1:8022 EVAL_MODEL=clef-flash-4bit EVAL_TAG=clefflash4 \
   PYTHON="/Users/yuya/.hermes/cache/scratch/clef-flash-8bit-venv/bin/python /Users/yuya/.hermes/cache/scratch/clef_flash_4bit_phase_wrapper.py" \
-  ./eval/ja/run_all.sh http://127.0.0.1:8021 clef-flash-4bit clefflash4 \
+  ./eval/ja/run_all.sh http://127.0.0.1:8022 clef-flash-4bit clefflash4 \
   /Users/yuya/src/github.com/katya4oyu/me/notes
 
 env -u PYTHONPATH -u PYTHONHOME \
-  EVAL_BASE=http://127.0.0.1:8021 EVAL_MODEL=clef-flash-4bit EVAL_TAG=clefflash4 \
+  EVAL_BASE=http://127.0.0.1:8022 EVAL_MODEL=clef-flash-4bit EVAL_TAG=clefflash4 \
   /Users/yuya/.hermes/cache/scratch/clef-flash-8bit-venv/bin/python -I \
   eval/ja/run_dialog_wording_polarity_check.py
 ```
 
-Repository checksは独立したworktree環境で実行する。
+## 検証・cleanup
 
-```bash
-uv --no-config sync --extra test
-env -u PYTHONPATH -u PYTHONHOME uv --no-config run pytest -q
-git diff --check
-```
-
-## 最終状態（未完）
-
-- worktree/branch：`/Users/yuya/src/github.com/katya4oyu/systemone-workbench/.worktrees/clef-flash-4bit` / `eval/clef-flash-4bit`、base `241c55b07ffe2fc07137154779556f2e993104b4`。
-- 初期checkpoint commit：`4725f79806970d277e39e62b184f136cea52fc70`（reportとcomparison列）。このcommitのworktreeはclean。suite完了後の最終結果commitは未作成。
-- port blockerのstatus checkpointもローカルcommit済み。suite result JSON、smoke、比較結果、final HEAD、最終結果commit：**未完了**。repo testsは現時点で65 passed（1 deprecation warning）、最終treeでも再確認する。現在server/watcher/評価processは停止済み。8021のport境界に関するMain判断後に評価を続ける。
+- append-only log：`/Users/yuya/.hermes/cache/scratch/clef_flash_4bit_eval.log`。同一inode `130388536` を維持。
+- `wiki_variants` は04:29:09にexit 0、focused checkは08:58:40に開始し08:59:04にexit 0。phase logにこの間の時間差の理由は記録されていないため、推論時間とはみなさない（原因は未確認）。
+- notification lifetime capに達したcollector PID 60857はtask-ownedのsentinelでexit 0を確認し、同じscriptをPID 94181で再起動。readiness後の残phase通知を受け取り、全phase後にsentinelでexit 0を確認。
+- task-owned model server PID 60841（固定snapshot、`127.0.0.1:8022`, `--no-truncate`）は評価後に停止。PID 60841/94181/61032はすべて終了し、8022 listenerなし、health probeはconnection refused。8021は操作していない。
+- `env -u PYTHONPATH -u PYTHONHOME uv --no-config run pytest -q` はこのレポート反映後にexit 0、65 passed / 0 failed。Starlette/anyio DeprecationWarning 1件。`git diff --check` もexit 0。

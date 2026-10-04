@@ -1,0 +1,76 @@
+{
+ "pages": {
+  "knowledge": 421,
+  "memos": 50
+ },
+ "link": {
+  "cases": 100,
+  "n": 298,
+  "errors": 0,
+  "acc": 0.903,
+  "ece": 0.059,
+  "mean_conf": 0.87,
+  "mean_p_pos": 0.895,
+  "mean_p_neg": 0.21,
+  "auc": 0.99,
+  "best_thr_acc": [
+   0.95,
+   0.75
+  ],
+  "acc[neg_easy]": 0.94,
+  "acc[neg_hard]": 0.776,
+  "acc[pos]": 0.99
+ },
+ "sense": {
+  "cases": 200,
+  "n": 200,
+  "errors": 0,
+  "acc": 0.81,
+  "ece": 0.017,
+  "mean_conf": 0.822,
+  "mean_p_pos": 0.713,
+  "mean_p_neg": 0.261,
+  "auc": 0.872,
+  "best_thr_acc": [
+   0.82,
+   0.4
+  ],
+  "acc[same_page]": 0.81,
+  "acc[sibling_pages]": 0.81
+ },
+ "type_knowledge": {
+  "cases": 100,
+  "n": 100,
+  "errors": 0,
+  "acc": 0.61,
+  "ece": 0.092,
+  "mean_conf": 0.689,
+  "majority_baseline": 0.96,
+  "confusion": {
+   "concept->concept": 59,
+   "concept->preference": 1,
+   "concept->synthesis": 23,
+   "concept->thinking": 13,
+   "preference->thinking": 1,
+   "synthesis->synthesis": 2,
+   "thinking->concept": 1
+  }
+ },
+ "type_memos": {
+  "cases": 50,
+  "n": 50,
+  "errors": 0,
+  "acc": 0.94,
+  "ece": 0.146,
+  "mean_conf": 0.838,
+  "majority_baseline": 0.66,
+  "confusion": {
+   "capture->capture": 31,
+   "capture->learning": 2,
+   "feedback->judgment": 1,
+   "idea->idea": 6,
+   "judgment->judgment": 2,
+   "learning->learning": 8
+  }
+ }
+}

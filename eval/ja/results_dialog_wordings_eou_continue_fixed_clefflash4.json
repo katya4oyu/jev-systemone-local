@@ -1,0 +1,15 @@
+{
+ "task": "end_of_utterance",
+ "question": "この発話にはまだ続きがありますか？",
+ "scored_label": "finished",
+ "n": 60,
+ "acc@0.5": 0.883,
+ "auc": 0.972,
+ "best_thr_acc": [
+  0.9,
+  0.75
+ ],
+ "fpr_at_recall90": 0.133,
+ "mean_p_pos": 0.908,
+ "mean_p_neg": 0.312
+}
