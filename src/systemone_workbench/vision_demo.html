@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>表情の見え方 — Clef-Flash ローカルデモ</title>
+  <style>
+    :root { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #17211d; background: #f5f4ef; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    main { width: min(100% - 32px, 760px); margin: 0 auto; padding: 52px 0 72px; }
+    .eyebrow { margin: 0 0 12px; color: #4a715f; font-size: 13px; font-weight: 750; letter-spacing: .08em; }
+    h1 { margin: 0; font-size: clamp(28px, 6vw, 42px); line-height: 1.18; letter-spacing: -.04em; }
+    .intro { max-width: 58ch; margin: 16px 0 30px; color: #4d5a54; font-size: 16px; line-height: 1.8; }
+    .panel { padding: clamp(18px, 4vw, 28px); border: 1px solid #dce2dc; border-radius: 20px; background: #fff; box-shadow: 0 12px 32px #1836290a; }
+    .drop { display: grid; justify-items: center; gap: 12px; min-height: 176px; padding: 22px; border: 1px dashed #9bb4a5; border-radius: 15px; background: #f8faf7; text-align: center; }
+    .icon { display: grid; width: 46px; height: 46px; place-items: center; border-radius: 14px; color: #276347; background: #e7f2eb; font-size: 22px; }
+    .drop label { font-size: 16px; font-weight: 700; }
+    input[type=file] { width: 100%; max-width: 360px; color: #405249; font-size: 16px; }
+    input[type=file]::file-selector-button { min-height: 44px; margin-right: 12px; padding: 0 14px; border: 1px solid #b9c9bf; border-radius: 10px; background: white; color: #1e4934; font: inherit; font-size: 16px; font-weight: 650; cursor: pointer; }
+    input[type=file]:focus-visible, button:focus-visible { outline: 3px solid #8ab89b; outline-offset: 3px; }
+    .hint { margin: 0; color: #63716a; font-size: 14px; line-height: 1.6; }
+    .preview-wrap { display: none; margin-top: 18px; }
+    .preview-wrap.visible { display: block; }
+    .preview-wrap img { display: block; max-width: 100%; max-height: 340px; margin: auto; border-radius: 12px; object-fit: contain; background: #f0f1ed; }
+    .filename { overflow-wrap: anywhere; margin: 8px 0 0; color: #66736c; text-align: center; font-size: 13px; }
+    .actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+    .camera-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .camera-controls button { flex: 1; }
+    .camera-view { display: none; margin: 16px 0; }
+    .camera-view.visible { display: block; }
+    .camera-view video { display: block; width: 100%; max-height: 340px; border-radius: 12px; object-fit: contain; background: #17211d; }
+    .camera-section { margin-bottom: 22px; padding-bottom: 20px; border-bottom: 1px solid #e5e9e5; }
+    button { min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; background: #1e5a3b; color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button:hover:not(:disabled) { background: #15482e; }
+    button:disabled { background: #aab8af; cursor: not-allowed; }
+    .status { min-height: 26px; margin: 14px 0 0; color: #42534a; font-size: 14px; line-height: 1.6; }
+    .status.error { color: #a52a2a; }
+    .results { display: none; margin-top: 24px; padding-top: 22px; border-top: 1px solid #e5e9e5; }
+    .results.visible { display: block; }
+    .result-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-bottom: 14px; }
+    .result-head h2 { margin: 0; font-size: 20px; }
+    .metadata { margin: 0; color: #627168; font-size: 13px; }
+    .face-status { margin: 12px 0 20px; padding: 12px 14px; border-radius: 11px; background: #edf5ef; color: #235039; font-size: 15px; line-height: 1.65; }
+    .face-status.unclear { background: #fff4e7; color: #684818; }
+    .result-group + .result-group { margin-top: 24px; }
+    .result-group h3 { margin: 0 0 12px; font-size: 15px; }
+    .bars { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+    .bar-row { display: grid; grid-template-columns: minmax(94px, 130px) minmax(70px, 1fr) 58px; align-items: center; gap: 10px; font-size: 14px; }
+    .bar-label { color: #33433a; }
+    .track { height: 10px; overflow: hidden; border-radius: 99px; background: #e8ede9; }
+    .fill { height: 100%; border-radius: inherit; background: #43815c; }
+    .bar-number { color: #203b2c; text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; }
+    .score-list { display: grid; gap: 11px; }
+    .score-row { display: grid; grid-template-columns: minmax(94px, 130px) minmax(70px, 1fr) 58px; align-items: center; gap: 10px; font-size: 14px; }
+    .score-row meter { width: 100%; height: 12px; }
+    .score-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; }
+    .caveat { margin: 28px 0 0; padding: 16px 18px; border-left: 3px solid #92ad9c; background: #eef1eb; color: #4b5a51; font-size: 13px; line-height: 1.75; }
+    .caveat strong { color: #273b2f; }
+    @media (max-width: 520px) {
+      main { width: min(100% - 24px, 760px); padding: 32px 0 48px; }
+      .bar-row, .score-row { grid-template-columns: 88px minmax(50px, 1fr) 54px; gap: 8px; font-size: 13px; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">CLEF-FLASH · ローカル推論</p>
+    <h1>表情の見え方を判定する</h1>
+    <p class="intro">画像に見える表情を、手元のClef-Flashモデルで評価します。本人の気持ちや人物の特定は判定しません。</p>
+
+    <section class="panel" aria-label="画像判定">
+      <div class="camera-section">
+        <div class="camera-controls">
+          <button id="camera-start" type="button">カメラで連続判定</button>
+          <button id="camera-stop" type="button" disabled>停止</button>
+        </div>
+        <p class="hint">カメラの使用を許可すると開始します。判定が終わるたびに次の1枚をMacへ送ります。音声は取得しません。</p>
+        <div id="camera-view" class="camera-view">
+          <video id="camera-video" autoplay muted playsinline aria-label="カメラのライブ映像"></video>
+          <p class="hint">ライブ映像。下の結果は直近に判定した静止画に対応します。</p>
+        </div>
+      </div>
+      <div class="drop">
+        <span class="icon" aria-hidden="true">↥</span>
+        <label for="image-file">画像を1枚選択</label>
+        <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" aria-describedby="file-hint">
+        <p id="file-hint" class="hint">JPEG・PNG・WebP ／ 4 MiB以下・1,600万画素以下</p>
+      </div>
+      <div id="preview-wrap" class="preview-wrap">
+        <img id="preview" alt="選択した画像のプレビュー">
+        <p id="filename" class="filename"></p>
+      </div>
+      <div class="actions"><button id="analyze" type="button" disabled>表情を判定</button></div>
+      <p id="status" class="status" role="status" aria-live="polite">画像を選ぶとプレビューが表示されます。</p>
+      <section id="results" class="results" aria-live="polite" aria-label="判定結果"></section>
+    </section>
+
+    <p class="caveat"><strong>結果の見方：</strong>7つの表情候補の相対確率と、6種類の表情成分の目安です。確率は校正された本人の感情の確率ではありません。顔が1つはっきり写っているかの確認もモデルによる判定で、顔検出器としての正確さは検証していません。確認できない場合は表情分類を表示しません。<br><br>JAFFEの管理された顔画像での分類正答率は、4-bitで43.2%、8-bitで43.7%でした。任意画像での精度は検証されておらず、画像条件や個人差によって誤判定します。</p>
+  </main>
+  <script type="module">
+    import { createCamera } from '/vision-camera.mjs';
+    (() => {
+      const input = document.querySelector('#image-file');
+      const previewWrap = document.querySelector('#preview-wrap');
+      const preview = document.querySelector('#preview');
+      const filename = document.querySelector('#filename');
+      const analyze = document.querySelector('#analyze');
+      const status = document.querySelector('#status');
+      const results = document.querySelector('#results');
+      const cameraStart = document.querySelector('#camera-start');
+      const cameraStop = document.querySelector('#camera-stop');
+      const cameraView = document.querySelector('#camera-view');
+      const cameraVideo = document.querySelector('#camera-video');
+      const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+      let selectedFile = null;
+      let previewUrl = null;
+      let selectionVersion = 0;
+      let inFlight = false;
+
+      const clearResults = () => {
+        results.replaceChildren();
+        results.classList.remove('visible');
+      };
+      const showError = (message) => {
+        status.textContent = message;
+        status.classList.add('error');
+      };
+      const make = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      };
+      const clearPreview = () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        preview.removeAttribute('src');
+        previewWrap.classList.remove('visible');
+        filename.textContent = '';
+      };
+      const clearSelection = () => {
+        selectionVersion += 1;
+        selectedFile = null;
+        analyze.disabled = true;
+        clearPreview();
+        clearResults();
+      };
+      const updateControls = () => {
+        input.disabled = camera.active || inFlight;
+        analyze.disabled = camera.active || inFlight || !selectedFile;
+        cameraStart.disabled = camera.active || inFlight;
+        cameraStop.disabled = !camera.active;
+      };
+
+      input.addEventListener('change', () => {
+        clearSelection();
+        status.classList.remove('error');
+        const file = input.files && input.files[0];
+        if (!file) {
+          status.textContent = '画像を選ぶとプレビューが表示されます。';
+          return;
+        }
+        if (!allowedTypes.has(file.type)) {
+          showError('JPEG、PNG、WebPの画像を選んでください。');
+          input.value = '';
+          return;
+        }
+        if (file.size > 4 * 1024 * 1024) {
+          showError('画像は4 MiB以下にしてください。');
+          input.value = '';
+          return;
+        }
+        selectedFile = file;
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        preview.alt = '選択した画像のプレビュー';
+        filename.textContent = file.name;
+        previewWrap.classList.add('visible');
+        analyze.disabled = false;
+        status.textContent = 'プレビューを確認して「表情を判定」を押してください。';
+      });
+
+      const toBase64 = async (file) => {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        let binary = '';
+        const chunkSize = 0x6000;
+        for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+          binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+        }
+        return btoa(binary);
+      };
+      const percent = (value) => `${(value * 100).toFixed(1)}%`;
+
+      const renderAnswers = (data) => {
+        results.replaceChildren();
+        const header = make('div', 'result-head');
+        header.append(make('h2', '', '判定結果'));
+        header.append(make('p', 'metadata', `${data.model.id} · ${data.model.quantization} · 推論 ${data.inference_ms.toFixed(1)} ms`));
+        results.append(header);
+
+        const faceStatus = make('p', `face-status${data.face_check.visible ? '' : ' unclear'}`,
+          data.face_check.visible
+            ? '顔が1つはっきり見えるというモデル判定です。顔の人数・鮮明さを保証する検出ではありません。'
+            : '評価対象の顔が1つはっきり見えるか判別できませんでした。表情の7分類は表示しません。顔検出器の確定判定ではありません。');
+        results.append(faceStatus);
+        if (data.answers) {
+          const expressionGroup = make('section', 'result-group');
+          expressionGroup.append(make('h3', '', '表情の候補 · 相対確率'));
+          const list = make('ul', 'bars');
+          const labels = {
+            neutral: '無表情に近い', happiness: '喜び', sadness: '悲しみ',
+            surprise: '驚き', anger: '怒り', disgust: '嫌悪', fear: '恐れ'
+          };
+          for (const key of Object.keys(labels)) {
+            const value = data.answers.expression.probabilities[key];
+            const row = make('li', 'bar-row');
+            row.append(make('span', 'bar-label', labels[key] || key));
+            const track = make('div', 'track');
+            const fill = make('div', 'fill');
+            fill.style.width = `${Math.max(0, Math.min(100, value * 100))}%`;
+            fill.setAttribute('role', 'meter');
+            fill.setAttribute('aria-label', `${labels[key] || key}の相対確率`);
+            fill.setAttribute('aria-valuemin', '0');
+            fill.setAttribute('aria-valuemax', '1');
+            fill.setAttribute('aria-valuenow', String(value));
+            track.append(fill);
+            row.append(track, make('span', 'bar-number', percent(value)));
+            list.append(row);
+          }
+          expressionGroup.append(list);
+          results.append(expressionGroup);
+
+          const scoreGroup = make('section', 'result-group');
+          scoreGroup.append(make('h3', '', '表情成分の強さ · 1〜5の目安'));
+          const scores = make('div', 'score-list');
+          for (const value of Object.values(data.answers.scores)) {
+            const row = make('div', 'score-row');
+            row.append(make('span', 'bar-label', value.name));
+            const meter = make('meter', '', '');
+            meter.min = 1; meter.max = 5; meter.value = value.value;
+            meter.setAttribute('aria-label', `${value.name}の表情成分`);
+            row.append(meter, make('span', 'score-value', value.value.toFixed(1)));
+            scores.append(row);
+          }
+          scoreGroup.append(scores);
+          results.append(scoreGroup);
+        }
+        results.classList.add('visible');
+      };
+
+      const requestAnalysis = async (file, isCurrent) => {
+        if (inFlight) throw new Error('前の判定が完了するまでお待ちください。');
+        inFlight = true;
+        updateControls();
+        try {
+          const response = await fetch('/vision/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: await toBase64(file), mime_type: file.type })
+          });
+          const data = await response.json();
+          if (!isCurrent()) return;
+          if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : '画像を判定できませんでした。');
+          return data;
+        } finally {
+          inFlight = false;
+          updateControls();
+        }
+      };
+      const camera = createCamera({
+        video: cameraVideo,
+        onState: state => {
+          if (state === 'starting') {
+            clearSelection();
+            input.value = '';
+            status.classList.remove('error');
+            status.textContent = 'カメラの使用許可を待っています。停止で開始を取り消せます。';
+          } else if (state === 'running') {
+            cameraView.classList.add('visible');
+            status.textContent = '連続判定を開始しました。';
+          } else {
+            selectionVersion += 1;
+            cameraView.classList.remove('visible');
+            status.textContent = inFlight
+              ? 'カメラを停止しました。処理中の判定結果は表示しません。'
+              : 'カメラを停止しました。最後の結果はそのまま表示しています。';
+          }
+          updateControls();
+        },
+        onFrame: async (frame, isCurrent) => {
+          status.textContent = '連続判定中：画像をローカルモデルで判定しています…';
+          const data = await requestAnalysis(frame, isCurrent);
+          if (!data || !isCurrent()) return;
+          clearPreview();
+          previewUrl = URL.createObjectURL(frame);
+          preview.src = previewUrl;
+          preview.alt = '直近に判定したカメラ画像';
+          filename.textContent = '直近に判定した画像';
+          previewWrap.classList.add('visible');
+          renderAnswers(data);
+        },
+        onError: error => {
+          const messages = {
+            NotAllowedError: 'カメラの使用が許可されていません。ブラウザのカメラ権限を確認して再度開始してください。',
+            NotFoundError: 'カメラが見つかりません。画像アップロードでも判定できます。',
+            NotReadableError: 'カメラを使用できません。他のアプリが使っていないか確認してください。',
+          };
+          showError(messages[error?.name] || error?.message || 'カメラの連続判定に失敗しました。再度開始してください。');
+        },
+      });
+      cameraStart.addEventListener('click', () => {
+        if (cameraStart.disabled) return;
+        if (!navigator.mediaDevices?.getUserMedia) {
+          showError('このブラウザではカメラを使えません。HTTPSで開くか、画像アップロードを使ってください。');
+          return;
+        }
+        void camera.start();
+      });
+      cameraStop.addEventListener('click', () => camera.stop());
+      window.addEventListener('pagehide', () => camera.stop());
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) camera.stop();
+      });
+
+      analyze.addEventListener('click', async () => {
+        if (!selectedFile || analyze.disabled) return;
+        const file = selectedFile;
+        const requestVersion = selectionVersion;
+        clearResults();
+        status.classList.remove('error');
+        status.textContent = '画像をローカルモデルで判定しています…';
+        try {
+          const data = await requestAnalysis(file, () => requestVersion === selectionVersion);
+          if (!data || requestVersion !== selectionVersion) return;
+          renderAnswers(data);
+          status.textContent = '判定が完了しました。別の画像を選ぶと結果は置き換わります。';
+        } catch (error) {
+          if (requestVersion !== selectionVersion) return;
+          showError(error instanceof Error ? error.message : '通信または推論に失敗しました。');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
