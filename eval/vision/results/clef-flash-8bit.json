@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-05T21:01:49+09:00",
+  "dataset": {
+    "name": "JAFFE",
+    "record": "https://zenodo.org/records/14974867",
+    "doi": "10.5281/zenodo.14974867",
+    "archive_bytes": 12290558,
+    "archive_md5": "fe13f3302eb9968ef04367456f665436",
+    "readme_bytes": 18459,
+    "readme_md5": "3d3e20343692832266cb094f0c54c5c0",
+    "image_count": 213,
+    "source_image_mode": "8-bit grayscale TIFF; palette images verified grayscale then converted L→RGB for Qwen3-VL processor",
+    "primary_rating_table_rows": 219,
+    "rating_join_matched_images": 212,
+    "image_without_rating_count": 1,
+    "rating_rows_without_image_count": 7,
+    "fear_excluded_table_used": false
+  },
+  "model": {
+    "id": "mlx-community/clef-flash-8bit",
+    "revision": "dfa0993decb4f8507a0eae01afd1b2d33a4bb734",
+    "snapshot": "/Users/yuya/.cache/huggingface/hub/models--mlx-community--clef-flash-8bit/snapshots/dfa0993decb4f8507a0eae01afd1b2d33a4bb734",
+    "bits": 8,
+    "backbone": "9B Qwen3.5 vision-language model with Clef joint-schema head",
+    "backend": "mlx-vlm vision path",
+    "loader_sha256": "852223c944819a32fad5cf798d9d1dff30419820eaf5ad1f10cb9698afec97d5",
+    "vision_enabled": true,
+    "input_truncation": false,
+    "max_length_tokens": 16384
+  },
+  "runtime": {
+    "python": "3.12.12",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "memory_bytes": 51539607552,
+    "default_mlx_device": "Device(gpu, 0)",
+    "metal_available": true,
+    "packages": {
+      "mlx": "0.32.3",
+      "mlx-vlm": "0.7.4",
+      "mlx-lm": "0.32.0",
+      "transformers": "5.18.0",
+      "Pillow": "12.3.0",
+      "numpy": "2.5.3"
+    }
+  },
+  "method": {
+    "questions_per_image": 7,
+    "requests_per_image": 1,
+    "input_state": "fixed Japanese text; no filename, person code, pose code, or reference rating",
+    "predicted_class_target": "requested posed-expression label in the filename; not a claim about felt emotion",
+    "human_rating_target": "six README_FIRST full-table perceptual mean ratings (60 Japanese female observers as documented there)",
+    "stored_per_image_predictions": false,
+    "stored_image_payloads": false,
+    "warmup_count": 5,
+    "latency_measurement_count": 40
+  },
+  "smoke": {
+    "same_fixed_state_and_seven_questions": true,
+    "cases": {
+      "posed_neutral": {
+        "input_tokens": 1203,
+        "has_vision_media": true,
+        "pixel_values_shape": [
+          256,
+          1536
+        ],
+        "image_grid_thw_shape": [
+          1,
+          3
+        ],
+        "elapsed_ms": 2898.208
+      },
+      "posed_happiness": {
+        "input_tokens": 1203,
+        "has_vision_media": true,
+        "pixel_values_shape": [
+          256,
+          1536
+        ],
+        "image_grid_thw_shape": [
+          1,
+          3
+        ],
+        "elapsed_ms": 2725.455
+      },
+      "image_absent_control": {
+        "input_tokens": 1136,
+        "has_vision_media": false,
+        "pixel_values_shape": null,
+        "image_grid_thw_shape": null,
+        "elapsed_ms": 2515.143
+      }
+    },
+    "posed_image_choice_differs": true,
+    "posed_image_rating_dimensions_differ": 6,
+    "neutral_vs_image_absent_choice_differs": false,
+    "happiness_vs_image_absent_choice_differs": true
+  },
+  "classification": {
+    "n_total": 213,
+    "n_valid": 213,
+    "errors": 0,
+    "accuracy": 0.43662,
+    "macro_f1": 0.389063,
+    "confusion": {
+      "neutral": {
+        "neutral": 30,
+        "happiness": 0,
+        "sadness": 0,
+        "surprise": 0,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 0
+      },
+      "happiness": {
+        "neutral": 11,
+        "happiness": 20,
+        "sadness": 0,
+        "surprise": 0,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 0
+      },
+      "sadness": {
+        "neutral": 21,
+        "happiness": 0,
+        "sadness": 10,
+        "surprise": 0,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 0
+      },
+      "surprise": {
+        "neutral": 3,
+        "happiness": 1,
+        "sadness": 0,
+        "surprise": 26,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 0
+      },
+      "anger": {
+        "neutral": 30,
+        "happiness": 0,
+        "sadness": 0,
+        "surprise": 0,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 0
+      },
+      "disgust": {
+        "neutral": 16,
+        "happiness": 0,
+        "sadness": 12,
+        "surprise": 0,
+        "anger": 0,
+        "disgust": 1,
+        "fear": 0
+      },
+      "fear": {
+        "neutral": 16,
+        "happiness": 0,
+        "sadness": 4,
+        "surprise": 6,
+        "anger": 0,
+        "disgust": 0,
+        "fear": 6
+      }
+    },
+    "per_label": {
+      "neutral": {
+        "support": 30,
+        "predicted": 127,
+        "precision": 0.23622,
+        "recall": 1.0,
+        "f1": 0.382166
+      },
+      "happiness": {
+        "support": 31,
+        "predicted": 21,
+        "precision": 0.952381,
+        "recall": 0.645161,
+        "f1": 0.769231
+      },
+      "sadness": {
+        "support": 31,
+        "predicted": 26,
+        "precision": 0.384615,
+        "recall": 0.322581,
+        "f1": 0.350877
+      },
+      "surprise": {
+        "support": 30,
+        "predicted": 32,
+        "precision": 0.8125,
+        "recall": 0.866667,
+        "f1": 0.83871
+      },
+      "anger": {
+        "support": 30,
+        "predicted": 0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "disgust": {
+        "support": 29,
+        "predicted": 1,
+        "precision": 1.0,
+        "recall": 0.034483,
+        "f1": 0.066667
+      },
+      "fear": {
+        "support": 32,
+        "predicted": 6,
+        "precision": 1.0,
+        "recall": 0.1875,
+        "f1": 0.315789
+      }
+    },
+    "per_pose": {
+      "NE": {
+        "n_total": 30,
+        "errors": 0,
+        "accuracy": 1.0
+      },
+      "HA": {
+        "n_total": 31,
+        "errors": 0,
+        "accuracy": 0.645161
+      },
+      "SA": {
+        "n_total": 31,
+        "errors": 0,
+        "accuracy": 0.322581
+      },
+      "SU": {
+        "n_total": 30,
+        "errors": 0,
+        "accuracy": 0.866667
+      },
+      "AN": {
+        "n_total": 30,
+        "errors": 0,
+        "accuracy": 0.0
+      },
+      "DI": {
+        "n_total": 29,
+        "errors": 0,
+        "accuracy": 0.034483
+      },
+      "FE": {
+        "n_total": 32,
+        "errors": 0,
+        "accuracy": 0.1875
+      }
+    },
+    "gold_pose_counts": {
+      "neutral": 30,
+      "happiness": 31,
+      "sadness": 31,
+      "surprise": 30,
+      "anger": 30,
+      "disgust": 29,
+      "fear": 32
+    },
+    "majority_class_baseline_accuracy": 0.150235,
+    "prediction_errors_are_in_accuracy_denominator": true
+  },
+  "human_ratings": {
+    "scale": "model expected score 0..4 plus one; README human mean ratings 1..5",
+    "dimensions": {
+      "HAP": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 0.766247,
+        "pearson_r": 0.811063,
+        "human_mean": 2.199387,
+        "model_mean": 1.437295,
+        "rating_name": "happiness"
+      },
+      "SAD": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 0.78887,
+        "pearson_r": 0.666195,
+        "human_mean": 2.589151,
+        "model_mean": 1.927925,
+        "rating_name": "sadness"
+      },
+      "SUR": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 0.602309,
+        "pearson_r": 0.893715,
+        "human_mean": 2.450755,
+        "model_mean": 1.866972,
+        "rating_name": "surprise"
+      },
+      "ANG": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 1.07269,
+        "pearson_r": 0.672031,
+        "human_mean": 2.465896,
+        "model_mean": 1.39517,
+        "rating_name": "anger"
+      },
+      "DIS": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 1.333226,
+        "pearson_r": 0.704272,
+        "human_mean": 2.768302,
+        "model_mean": 1.445866,
+        "rating_name": "disgust"
+      },
+      "FEA": {
+        "n_total": 212,
+        "n_valid": 212,
+        "errors": 0,
+        "mae": 0.715435,
+        "pearson_r": 0.621056,
+        "human_mean": 2.338915,
+        "model_mean": 1.719704,
+        "rating_name": "fear"
+      }
+    },
+    "all_matched_dimensions": {
+      "n_total": 1272,
+      "n_valid": 1272,
+      "errors": 0,
+      "mae": 0.879796,
+      "pearson_r": 0.667576
+    }
+  },
+  "timing": {
+    "full_suite": {
+      "n_successful_requests": 213,
+      "n_total_requests": 213,
+      "request_errors": 0,
+      "vision_media_requests": 213,
+      "input_tokens": {
+        "total": 256239,
+        "min": 1203,
+        "max": 1203,
+        "distinct_count": 1
+      },
+      "pixel_values_shape_counts": {
+        "256x1536": 213
+      },
+      "image_grid_thw_shape_counts": {
+        "1x3": 213
+      },
+      "scope": "one request/image with seven schema questions; includes model image-processor preprocessing and forward pass, excludes model loading and TIFF file I/O/PIL grayscale-to-RGB conversion",
+      "total_seconds": 609.015,
+      "p50_ms": 2850.586,
+      "p95_ms": 2988.229
+    },
+    "warm_single_image": {
+      "scope": "single preloaded image; MLX image processor + vision/backbone + joint head; wall clock, excludes model loading and TIFF file I/O/PIL grayscale-to-RGB conversion",
+      "warmup_count": 5,
+      "measurement_count": 40,
+      "p50_ms": 2933.23,
+      "p95_ms": 3109.485
+    }
+  },
+  "errors": {
+    "request_errors_by_exception_type": {},
+    "invalid_choice_outputs": 0
+  },
+  "provenance": {
+    "rating_join_mismatches_preserved_without_correction": true,
+    "image_without_rating_count": 1,
+    "rating_rows_without_image_count": 7,
+    "rating_metrics_denominator": 212
+  }
+}
