@@ -12,6 +12,10 @@ def choice(question, yes, no, yes_d, no_d):
 def noul(question):
     return lambda: ({"type": "noul", "instructions": question}, lambda a: a["noul"])
 
+def noul_for_finished(question):
+    """Map a question phrased as continuation onto the shared finished label."""
+    return lambda: ({"type": "noul", "instructions": question}, lambda a: 1 - a["noul"])
+
 def main(c=None):
     c = c or Client("http://127.0.0.1:8017")
     out = {}
@@ -19,7 +23,7 @@ def main(c=None):
     W = {
      "noul_短い": noul("話し終えた？"),
      "noul_文が完結": noul("この文は文として完結していますか？"),
-     "noul_続く": noul("この発話にはまだ続きがありますか？"),
+     "noul_続く": noul_for_finished("この発話にはまだ続きがありますか？"),
      "choice_言い終わり/言いかけ": choice("この発話の状態は？", "言い終わり", "言いかけ", "文が終わっている", "文の途中で終わっている"),
      "choice_完全な文/途切れた文": choice("この文字列はどちらですか？", "完全な文", "途切れた文", "意味が最後まで通る文", "途中で切れて意味が完結しない文"),
     }
