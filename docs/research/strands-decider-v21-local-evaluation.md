@@ -31,4 +31,10 @@ env -u PYTHONPATH -u PYTHONHOME uv --no-config run pytest -q
 
 ## 日本語 suite
 
-実行コマンドと結果 JSON は次節・評価完了時に記録する。`eval/ja/run_all.sh` の第4引数（私的 wiki ディレクトリ）は渡さず、公開/合成の標準 suite のみを実行する。全 suite 完了前に総合評価とは扱わない。
+`eval/ja/run_all.sh` は実行中。tag `strandsv21mlx_20261009`、localhost `127.0.0.1:8024`、model override `strands-decider-2B-hobson-v21`。第4引数（私的 wiki ディレクトリ）は省略し、公開/合成の標準 suite のみを対象にした。進行中の `run.py` が次へ進んだことをもって、直前 task の終了を確認している。
+
+- `run.py`: latency、choice、label_lang、noul、score は完了。latency client p50/p95 は単発 57.0/57.8 ms、5問 batch 186.1/189.5 ms。5分類 choice の accuracy は2/5/10/20/50候補で 0.958/0.958/0.958/0.958/0.917（各24件、errors 0）。日本語/英語ラベルは各0.958。noul positive/negated/English は各20件すべて accuracy 1.000、errors 0。score Pearson r 0.965、MAE 0.49（10件）。現在 context task 実行中。
+- `run_ts.py`, `run_dialog.py`, `run_dialog_wordings.py`, `run_wiki_synth.py`: `run_all.sh` の後続 task として未完了。
+- 現時点で `run.py` のJSONに入る model key は harness 上 `laya-multilingual-mlx` と固定されているが、全 request は `EVAL_MODEL=strands-decider-2B-hobson-v21` override を通る。直前の実推論 response の model 名も検証済み。保存された結果は全完了後に集計・確認する。
+
+全 suite 完了前に総合評価とは扱わない。
