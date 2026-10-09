@@ -1,0 +1,230 @@
+{
+ "latency": {
+  "laya-multilingual-mlx": {
+   "single": {
+    "p50_ms": 57.0,
+    "p95_ms": 57.8
+   },
+   "batch5": {
+    "p50_ms": 186.1,
+    "p95_ms": 189.5
+   }
+  }
+ },
+ "choice_scaling": {
+  "laya-multilingual-mlx": {
+   "2": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.071,
+    "mean_conf": 0.923
+   },
+   "5": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.138,
+    "mean_conf": 0.867
+   },
+   "10": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.032,
+    "mean_conf": 0.969
+   },
+   "20": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.04,
+    "mean_conf": 0.972
+   },
+   "50": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.917,
+    "ece": 0.112,
+    "mean_conf": 0.863
+   }
+  }
+ },
+ "label_language": {
+  "ja_labels": 0.958,
+  "en_labels": 0.958
+ },
+ "noul": {
+  "positive": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.143,
+   "mean_conf": 0.857,
+   "mean_p_aggr_on_aggr": 0.821,
+   "mean_p_aggr_on_benign": 0.107
+  },
+  "negated": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.232,
+   "mean_conf": 0.768,
+   "mean_p_aggr_on_aggr": 0.819,
+   "mean_p_aggr_on_benign": 0.284
+  },
+  "no_criteria_english": {
+   "n": 20,
+   "errors": 0,
+   "acc": 1.0,
+   "ece": 0.128,
+   "mean_conf": 0.872,
+   "mean_p_aggr_on_aggr": 0.823,
+   "mean_p_aggr_on_benign": 0.079
+  }
+ },
+ "score": {
+  "pearson_r": 0.965,
+  "mae": 0.49,
+  "argmax_level_counts(gold=2 each)": [
+   3,
+   1,
+   2,
+   1,
+   3
+  ],
+  "scores": [
+   0.83,
+   0.82,
+   1.16,
+   1.04,
+   1.7,
+   1.9,
+   2.84,
+   2.83,
+   2.81,
+   2.88
+  ]
+ },
+ "context": {
+  "laya-multilingual-mlx": {
+   "300/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.124,
+    "mean_conf": 0.887,
+    "input_tokens": 149
+   },
+   "300/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.124,
+    "mean_conf": 0.887,
+    "input_tokens": 149
+   },
+   "700/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.208,
+    "mean_conf": 0.792,
+    "input_tokens": 553
+   },
+   "700/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.129,
+    "mean_conf": 0.871,
+    "input_tokens": 553
+   },
+   "1000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.215,
+    "mean_conf": 0.785,
+    "input_tokens": 856
+   },
+   "1000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.131,
+    "mean_conf": 0.869,
+    "input_tokens": 856
+   },
+   "2000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.234,
+    "mean_conf": 0.766,
+    "input_tokens": 1866
+   },
+   "2000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.139,
+    "mean_conf": 0.861,
+    "input_tokens": 1866
+   },
+   "4000/message_last": {
+    "n": 24,
+    "errors": 0,
+    "acc": 0.958,
+    "ece": 0.218,
+    "mean_conf": 0.75,
+    "input_tokens": 3886
+   },
+   "4000/message_first": {
+    "n": 24,
+    "errors": 0,
+    "acc": 1.0,
+    "ece": 0.139,
+    "mean_conf": 0.861,
+    "input_tokens": 3886
+   },
+   "6000/message_last": {
+    "n": 0,
+    "errors": 12,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"prompt of 5905 tokens exceeds the context window of 4096 tokens\"}"
+   },
+   "6000/message_first": {
+    "n": 0,
+    "errors": 12,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"prompt of 5905 tokens exceeds the context window of 4096 tokens\"}"
+   },
+   "8000/message_last": {
+    "n": 0,
+    "errors": 12,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"prompt of 7925 tokens exceeds the context window of 4096 tokens\"}"
+   },
+   "8000/message_first": {
+    "n": 0,
+    "errors": 12,
+    "acc": null,
+    "ece": null,
+    "mean_conf": null,
+    "input_tokens": null,
+    "last_error": "422 {\"detail\":\"prompt of 7925 tokens exceeds the context window of 4096 tokens\"}"
+   }
+  },
+  "tokens_per_filler": 100.9
+ }
+}
