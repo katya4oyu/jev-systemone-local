@@ -1,0 +1,117 @@
+{
+  "official_model": "LiquidAI/d1-3B",
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "python": "3.12.12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "torch": "2.14.1",
+  "torchvision": "0.29.1",
+  "transformers": "5.14.1",
+  "device": "mps",
+  "dtype": "torch.bfloat16",
+  "model_load_seconds": 11.037,
+  "native_system_one": {
+    "method": "model.system_one(state, named_questions)",
+    "elapsed_ms": 895.9,
+    "usage": {
+      "input_tokens": 151,
+      "output_tokens": 0
+    },
+    "answers": {
+      "language": {
+        "type": "noul",
+        "noul": 0.9808759632491112
+      },
+      "category": {
+        "type": "choice",
+        "choice": "返品・返金",
+        "confidence": 0.9924227587321393,
+        "probabilities": {
+          "返品・返金": 0.9924227587321393,
+          "配送": 0.007577241267860811
+        }
+      },
+      "satisfaction": {
+        "type": "score",
+        "score": 0.3883547349769845,
+        "confidence": 0.6865797643039393,
+        "probabilities": {
+          "0": 0.6865797643039393,
+          "1": 0.25257858001175376,
+          "2": 0.04973567131081099,
+          "3": 0.008119125150374978,
+          "4": 0.0029868592231209494
+        },
+        "legend": {
+          "0": "非常に不満",
+          "1": "不満",
+          "2": "普通",
+          "3": "満足",
+          "4": "非常に満足"
+        }
+      }
+    }
+  },
+  "native_system_one_batch": {
+    "method": "model.system_one_batch(requests)",
+    "request_count": 6,
+    "elapsed_ms": 560.1,
+    "cases": {
+      "japanese_positive": {
+        "p_yes": 0.9755769099458929,
+        "expected_yes": true,
+        "threshold_match": true
+      },
+      "japanese_negative_english": {
+        "p_yes": 0.10087862273005653,
+        "expected_yes": false,
+        "threshold_match": true
+      },
+      "toxicity_positive": {
+        "p_yes": 0.9149009549929797,
+        "expected_yes": true,
+        "threshold_match": true
+      },
+      "toxicity_negative": {
+        "p_yes": 0.01691491326672651,
+        "expected_yes": false,
+        "threshold_match": true
+      },
+      "explicitly_negated_benign_positive": {
+        "p_yes": 0.9796676466573412,
+        "expected_yes": true,
+        "threshold_match": true
+      },
+      "explicitly_negated_hostile_negative": {
+        "p_yes": 0.1561048974454574,
+        "expected_yes": false,
+        "threshold_match": true
+      }
+    },
+    "usage": [
+      {
+        "input_tokens": 36,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 31,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 46,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 45,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 49,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 50,
+        "output_tokens": 0
+      }
+    ]
+  }
+}

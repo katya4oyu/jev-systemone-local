@@ -1,0 +1,159 @@
+{
+  "tag": "liquid_d1_mps_20261010",
+  "model": {
+    "id": "liquidai-d1-3b-pytorch-mps",
+    "official_model": "LiquidAI/d1-3B",
+    "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+    "device": "mps",
+    "dtype": "torch.bfloat16",
+    "max_input_tokens": 32768
+  },
+  "suite_results": {
+    "main": {
+      "file": "eval/ja/results_liquid_d1_mps_20261010.json",
+      "successful_cases": 526,
+      "reported_case_errors": 0,
+      "completed_cases": 526,
+      "expected_cases": 526,
+      "script_requests_expected": 613
+    },
+    "timeseries": {
+      "file": "eval/ja/results_ts_liquid_d1_mps_20261010.json",
+      "successful_cases": 780,
+      "reported_case_errors": 0,
+      "completed_cases": 780,
+      "expected_cases": 780,
+      "script_requests_expected": 780
+    },
+    "dialog": {
+      "file": "eval/ja/results_dialog_liquid_d1_mps_20261010.json",
+      "successful_cases": 413,
+      "reported_case_errors": 0,
+      "completed_cases": 413,
+      "expected_cases": 413,
+      "script_requests_expected": 413
+    },
+    "wordings": {
+      "file": "eval/ja/results_dialog_wordings_liquid_d1_mps_20261010.json",
+      "successful_cases": 540,
+      "reported_case_errors": 0,
+      "completed_cases": 540,
+      "expected_cases": 540,
+      "script_requests_expected": 540
+    },
+    "wiki_synth": {
+      "file": "eval/ja/results_wiki_synth_liquid_d1_mps_20261010.json",
+      "successful_cases": 260,
+      "reported_case_errors": 0,
+      "completed_cases": 260,
+      "expected_cases": 260,
+      "script_requests_expected": 260
+    }
+  },
+  "totals": {
+    "suite_files": 5,
+    "completed_cases": 2519,
+    "successful_cases": 2519,
+    "reported_case_errors": 0,
+    "expected_http_requests": 2606,
+    "observed_http_requests": 2606,
+    "observed_successful_requests": 2606,
+    "rejected_requests": 0,
+    "runtime_errors": 0,
+    "expected_questions": 2766,
+    "observed_questions": 2766,
+    "observed_question_types": {
+      "choice": 1377,
+      "noul": 1379,
+      "score": 10
+    },
+    "max_prepared_input_tokens_during_suites": 7910,
+    "max_response_usage_input_tokens_during_suites": 7910,
+    "input_context_limit": 32768
+  },
+  "comparison": {
+    "LiquidAI/d1-3B": {
+      "latency_single_p50_ms": 49.5,
+      "latency_batch5_p50_ms": 127.0,
+      "latency_batch5_p95_ms": 129.7,
+      "choice_50_accuracy": 0.833,
+      "japanese_label_accuracy": 1.0,
+      "english_label_accuracy": 0.958,
+      "noul_negated_accuracy": 1.0,
+      "score_mae": 0.281,
+      "eou_choice_auc": 0.896,
+      "eou_choice_acc_at_0_5": 0.783,
+      "eou_wording_auc_min": 0.672,
+      "eou_wording_auc_max": 0.919,
+      "react_choice_accuracy": 0.689,
+      "memory_choice_auc": 0.978,
+      "topic_drift_choice_auc": 1.0,
+      "wiki_link_choice_auc": 0.982,
+      "max_successful_context_usage_tokens": 7905
+    },
+    "Kev-4B": {
+      "latency_single_p50_ms": 47.0,
+      "latency_batch5_p50_ms": 149.0,
+      "latency_batch5_p95_ms": 151.1,
+      "choice_50_accuracy": 1.0,
+      "japanese_label_accuracy": 1.0,
+      "english_label_accuracy": 1.0,
+      "noul_negated_accuracy": 1.0,
+      "score_mae": 0.194,
+      "eou_choice_auc": 0.882,
+      "eou_choice_acc_at_0_5": 0.733,
+      "eou_wording_auc_min": 0.068,
+      "eou_wording_auc_max": 0.927,
+      "react_choice_accuracy": 0.667,
+      "memory_choice_auc": 1.0,
+      "topic_drift_choice_auc": 1.0,
+      "wiki_link_choice_auc": 0.977,
+      "max_successful_context_usage_tokens": 7882
+    },
+    "Clef-Flash (8bit MLX)": {
+      "latency_single_p50_ms": 353.9,
+      "latency_batch5_p50_ms": 1231.5,
+      "latency_batch5_p95_ms": 1256.1,
+      "choice_50_accuracy": 0.833,
+      "japanese_label_accuracy": 0.958,
+      "english_label_accuracy": 0.958,
+      "noul_negated_accuracy": 1.0,
+      "score_mae": 0.162,
+      "eou_choice_auc": 0.976,
+      "eou_choice_acc_at_0_5": 0.8,
+      "eou_wording_auc_min": 0.013,
+      "eou_wording_auc_max": 0.991,
+      "react_choice_accuracy": 0.844,
+      "memory_choice_auc": 1.0,
+      "topic_drift_choice_auc": 1.0,
+      "wiki_link_choice_auc": 0.992,
+      "max_successful_context_usage_tokens": 8018
+    },
+    "Strands-Decider-v21": {
+      "latency_single_p50_ms": 57.0,
+      "latency_batch5_p50_ms": 186.1,
+      "latency_batch5_p95_ms": 189.5,
+      "choice_50_accuracy": 0.917,
+      "japanese_label_accuracy": 0.958,
+      "english_label_accuracy": 0.958,
+      "noul_negated_accuracy": 1.0,
+      "score_mae": 0.49,
+      "eou_choice_auc": 0.909,
+      "eou_choice_acc_at_0_5": 0.75,
+      "eou_wording_auc_min": 0.811,
+      "eou_wording_auc_max": 0.971,
+      "react_choice_accuracy": 0.356,
+      "memory_choice_auc": 0.925,
+      "topic_drift_choice_auc": 0.995,
+      "wiki_link_choice_auc": 0.921,
+      "max_successful_context_usage_tokens": 3886
+    }
+  },
+  "comparison_sources": {
+    "Kev-4B": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_kev4b.json",
+    "Clef-Flash (8bit MLX)": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_clefflash8.json",
+    "Strands-Decider-v21": "eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53:eval/ja/results*strandsv21mlx_20261009.json"
+  },
+  "stats_baseline": "eval/d1/stats_before.json",
+  "stats_after": "eval/d1/stats_after.json"
+}

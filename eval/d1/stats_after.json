@@ -1,0 +1,22 @@
+{
+  "systemone_requests": 2609,
+  "successful_requests": 2608,
+  "rejected_requests": 1,
+  "runtime_errors": 0,
+  "questions": 2772,
+  "question_types": {
+    "choice": 1379,
+    "noul": 1381,
+    "score": 12
+  },
+  "max_prepared_input_tokens": 7910,
+  "max_response_usage_input_tokens": 7910,
+  "model": {
+    "id": "liquidai-d1-3b-pytorch-mps",
+    "official_model": "LiquidAI/d1-3B",
+    "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+    "device": "mps",
+    "dtype": "torch.bfloat16",
+    "max_input_tokens": 32768
+  }
+}
