@@ -8,7 +8,7 @@
 
 The official `LiquidAI/d1-3B` checkpoint loaded and ran its real `system_one` and `system_one_batch` methods on MPS in bfloat16. All five existing suites completed: **2,519/2,519 scored cases**, **2,606/2,606 HTTP calls**, and **2,766/2,766 named questions**; zero suite errors, rejections, or runtime exceptions. The longest prepared sequence during the suites was **7,910 tokens**, below the checkpoint's 32,768-token context limit; the context suite itself reported up to 7,905 input tokens.
 
-D1's warm HTTP p50 was 49.5 ms for one question and 127.0 ms for five questions over one state. It tied Clef-Flash-8B at 0.833 on 50-way choice accuracy, matched the other historical models on the explicitly negated toxicity question (1.000), and scored between Kev/Clef and Strands on several conversational tasks. Its score MAE (0.281) was worse than Kev-4B (0.194) and Clef-Flash-8B (0.162), but better than Strands Decider v2.1 (0.490). These are small hand-written task-suite observations, not a general model ranking.
+D1's warm HTTP p50 was 49.5 ms for one question and 127.0 ms for five questions over one state. It tied Clef-Flash (8bit MLX) at 0.833 on 50-way choice accuracy, matched the other historical models on the explicitly negated toxicity question (1.000), and scored between Kev/Clef and Strands on several conversational tasks. Its score MAE (0.281) was worse than Kev-4B (0.194) and Clef-Flash (8bit MLX) (0.162), but better than Strands Decider v21 (0.490). These are small hand-written task-suite observations, not a general model ranking.
 
 ## Checkpoint and host evidence
 
@@ -58,14 +58,14 @@ The suite runner wrote results under the constant key `laya-multilingual-mlx` in
 
 ## Historical comparison
 
-Same result definitions and hand-written suite assets; historical rows were read, not rerun. Kev-4B and Clef-Flash-8B files are from `origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef`; Strands Decider v2.1 files are from `eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53`, tag `strandsv21mlx_20261009`.
+Same result definitions and hand-written suite assets; historical rows were read, not rerun. Kev-4B and Clef-Flash (8bit MLX) files are from `origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef`; Strands Decider v21 files are from `eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53`, tag `strandsv21mlx_20261009`. The `8` in the Clef result tag denotes quantization bits, not parameter count; the Strands checkpoint suffix is `v21`, not `v2.1`.
 
 | Model/result | Single p50 ms | Batch-5 p50 ms | Choice-50 acc | Negated noul acc | Score MAE ↓ | EOU choice AUC | React acc | Memory choice AUC | Drift choice AUC | Wiki link choice AUC | Max successful context usage tokens |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | **LiquidAI/d1-3B (this run)** | 49.5 | 127.0 | 0.833 | 1.000 | 0.281 | 0.896 | 0.689 | 0.978 | 1.000 | 0.982 | 7,905 |
 | Kev-4B | 47.0 | 149.0 | 1.000 | 1.000 | 0.194 | 0.882 | 0.667 | 1.000 | 1.000 | 0.977 | 7,882 |
-| Clef-Flash-8B | 353.9 | 1,231.5 | 0.833 | 1.000 | 0.162 | 0.976 | 0.844 | 1.000 | 1.000 | 0.992 | 8,018 |
-| Strands Decider v2.1 | 57.0 | 186.1 | 0.917 | 1.000 | 0.490 | 0.909 | 0.356 | 0.925 | 0.995 | 0.921 | 3,886 |
+| Clef-Flash (8bit MLX) | 353.9 | 1,231.5 | 0.833 | 1.000 | 0.162 | 0.976 | 0.844 | 1.000 | 1.000 | 0.992 | 8,018 |
+| Strands Decider v21 | 57.0 | 186.1 | 0.917 | 1.000 | 0.490 | 0.909 | 0.356 | 0.925 | 0.995 | 0.921 | 3,886 |
 
 The M4 Pro/48 GB hardware is shared context for these runs, but quantization, runtime/kernel versions, and run conditions differ; this is not a controlled A/B. The table intentionally separates task accuracy/AUC from confidence and uses the standard EOU `choice2` result. Alternate-wording scores are reported as ranges, not averaged; wording and polarity matter. Strands' context results reached only the ~4k range in its stored result set, so its context figure is not an 8k comparison.
 

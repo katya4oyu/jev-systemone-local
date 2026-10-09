@@ -110,7 +110,7 @@
       "wiki_link_choice_auc": 0.977,
       "max_successful_context_usage_tokens": 7882
     },
-    "Clef-Flash-8B": {
+    "Clef-Flash (8bit MLX)": {
       "latency_single_p50_ms": 353.9,
       "latency_batch5_p50_ms": 1231.5,
       "latency_batch5_p95_ms": 1256.1,
@@ -129,7 +129,7 @@
       "wiki_link_choice_auc": 0.992,
       "max_successful_context_usage_tokens": 8018
     },
-    "Strands-Decider-v2.1": {
+    "Strands-Decider-v21": {
       "latency_single_p50_ms": 57.0,
       "latency_batch5_p50_ms": 186.1,
       "latency_batch5_p95_ms": 189.5,
@@ -151,8 +151,8 @@
   },
   "comparison_sources": {
     "Kev-4B": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_kev4b.json",
-    "Clef-Flash-8B": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_clefflash8.json",
-    "Strands-Decider-v2.1": "eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53:eval/ja/results*strandsv21mlx_20261009.json"
+    "Clef-Flash (8bit MLX)": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_clefflash8.json",
+    "Strands-Decider-v21": "eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53:eval/ja/results*strandsv21mlx_20261009.json"
   },
   "stats_baseline": "eval/d1/stats_before.json",
   "stats_after": "eval/d1/stats_after.json"

@@ -166,13 +166,13 @@ def historical_sources() -> dict[str, dict[str, Path]]:
             "wordings": EVAL / "results_dialog_wordings_kev4b.json",
             "wiki": EVAL / "results_wiki_synth_kev4b.json",
         },
-        "Clef-Flash-8B": {
+        "Clef-Flash (8bit MLX)": {
             "main": EVAL / "results_clefflash8.json",
             "dialog": EVAL / "results_dialog_clefflash8.json",
             "wordings": EVAL / "results_dialog_wordings_clefflash8.json",
             "wiki": EVAL / "results_wiki_synth_clefflash8.json",
         },
-        "Strands-Decider-v2.1": {
+        "Strands-Decider-v21": {
             "main": strands / f"results_{tag}.json",
             "dialog": strands / f"results_dialog_{tag}.json",
             "wordings": strands / f"results_dialog_wordings_{tag}.json",
@@ -267,8 +267,8 @@ def build(tag: str, before_path: Path, after_path: Path) -> dict[str, Any]:
         "comparison": comparison,
         "comparison_sources": {
             "Kev-4B": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_kev4b.json",
-            "Clef-Flash-8B": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_clefflash8.json",
-            "Strands-Decider-v2.1": "eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53:eval/ja/results*strandsv21mlx_20261009.json",
+            "Clef-Flash (8bit MLX)": "origin/main@8e714df8dbf7acffe098e686295a10df74b1d9ef:eval/ja/results*_clefflash8.json",
+            "Strands-Decider-v21": "eval/strands-decider-v21@8775969b63b3a29ad91b2d77bd311e2e1a341f53:eval/ja/results*strandsv21mlx_20261009.json",
         },
         "stats_baseline": str(before_path.relative_to(ROOT)),
         "stats_after": str(after_path.relative_to(ROOT)),
